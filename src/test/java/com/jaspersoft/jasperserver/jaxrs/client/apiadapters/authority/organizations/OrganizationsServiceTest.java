@@ -17,7 +17,7 @@ import static org.testng.AssertJUnit.assertNull;
 /**
  * @author Tetiana Iefimenko
  */
-public class OrganizationsServiceIT extends RestClientTestUtil {
+public class OrganizationsServiceTest extends RestClientTestUtil {
 
     private ClientTenant organization;
 

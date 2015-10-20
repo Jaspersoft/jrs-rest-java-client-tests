@@ -17,7 +17,7 @@ import static org.testng.AssertJUnit.assertNotNull;
  * @author Alexander Krasnyanskiy
  * @author tetiana Iefimenko
  */
-public class ResourcesServiceIT extends RestClientTestUtil {
+public class ResourcesServiceTest extends RestClientTestUtil {
 
     @BeforeClass
     public void before() {

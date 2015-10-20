@@ -15,7 +15,7 @@ import static org.junit.Assert.assertTrue;
  * @author Tetiana Iefimenko
  */
 
-public class BundlesServiceIT extends RestClientTestUtil {
+public class BundlesServiceTest extends RestClientTestUtil {
 
     private AnonymousSession session;
 

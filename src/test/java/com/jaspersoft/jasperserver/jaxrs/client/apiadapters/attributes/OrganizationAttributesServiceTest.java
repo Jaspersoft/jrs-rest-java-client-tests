@@ -1,6 +1,5 @@
 package com.jaspersoft.jasperserver.jaxrs.client.apiadapters.attributes;
 
-import com.jaspersoft.jasperserver.dto.authority.ClientUser;
 import com.jaspersoft.jasperserver.dto.authority.ClientUserAttribute;
 import com.jaspersoft.jasperserver.dto.authority.hypermedia.HypermediaAttribute;
 import com.jaspersoft.jasperserver.dto.authority.hypermedia.HypermediaAttributesListWrapper;
@@ -15,73 +14,69 @@ import org.testng.annotations.Test;
 
 import static java.util.Arrays.asList;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
+import static org.junit.Assert.assertTrue;
 import static org.testng.AssertJUnit.assertEquals;
 import static org.testng.AssertJUnit.assertNotNull;
-import static org.testng.AssertJUnit.assertTrue;
+import static org.testng.AssertJUnit.assertNull;
 
-@Test(sequential = true)
-public class UserAttributesServiceIT extends RestClientTestUtil {
-    private HypermediaAttribute userAttribute;
-    private HypermediaAttributesListWrapper userAttributes;
-    private String orgName;
-    private String userName;
+@Test
+public class OrganizationAttributesServiceTest extends RestClientTestUtil {
+
+    private HypermediaAttribute organizationAttribute;
+    private HypermediaAttributesListWrapper organizationAttributes;
+    private String organizationName;
 
     @BeforeClass
     public void before() {
-        userAttribute = new HypermediaAttribute();
-        userAttribute.setName("test_user_attribute");
-        userAttribute.setValue("test_value");
-        userAttributes = new HypermediaAttributesListWrapper();
-        userAttributes.setProfileAttributes(asList(
-                new HypermediaAttribute(new ClientUserAttribute().setName("test_user_attribute_1").setValue("test_value_1")),
-                new HypermediaAttribute(new ClientUserAttribute().setName("test_user_attribute_2").setValue("test_value_2"))));
-        orgName = "myOrg1";
-        userName = "jasperadmin";
+        organizationAttributes = new HypermediaAttributesListWrapper();
+        organizationAttributes.setProfileAttributes(asList(
+                new HypermediaAttribute(new ClientUserAttribute().setName("test_org_attr_1").setValue("test_value")),
+                new HypermediaAttribute(new ClientUserAttribute().setName("test_org_attr_2").setValue("test_value"))));
+        organizationAttribute = new HypermediaAttribute();
+        organizationAttribute.setName("test_org_attr");
+        organizationAttribute.setValue("test_value");
+        organizationName = "myOrg1";
         initClient();
         initSession();
     }
 
     @Test
-    public void should_create_single_attribute() {
-
-        OperationResult<HypermediaAttribute> operationResult = session
+    public void should_create_organization_attribute() {
+        OperationResult<HypermediaAttribute> retrieved = session
                 .attributesService()
-                .forOrganization(orgName)
-                .forUser(userName)
-                .attribute(userAttribute.getName())
-                .createOrUpdate(userAttribute);
+                .forOrganization(organizationName)
+                .attribute(organizationAttribute.getName())
+                .createOrUpdate(organizationAttribute);
 
-        HypermediaAttribute entity = operationResult.getEntity();
+        assertNotNull(retrieved);
+        assertEquals(retrieved.getEntity().getName(), organizationAttribute.getName());
 
-        assertNotNull(entity);
-        assertEquals(Response.Status.CREATED.getStatusCode(), operationResult.getResponse().getStatus());
     }
 
-    @Test(dependsOnMethods = "should_create_single_attribute")
-    public void should_return_attribute() throws InterruptedException {
+    @Test(dependsOnMethods = "should_create_organization_attribute")
+    public void should_return_attribute() {
         HypermediaAttribute entity = session
                 .attributesService()
-                .forOrganization(orgName)
-                .forUser(userName)
-                .attribute(userAttribute.getName())
+                .forOrganization(organizationName)
+                .attribute(organizationAttribute.getName())
                 .get()
                 .getEntity();
 
-        assertEquals(entity.getValue(), userAttribute.getValue());
+        assertEquals(entity.getValue(), organizationAttribute.getValue());
+        assertNull(entity.getEmbedded());
     }
 
     @Test(dependsOnMethods = "should_return_attribute")
     public void should_return_attribute_with_permissions() {
         HypermediaAttribute entity = session
                 .attributesService()
-                .forOrganization(orgName)
-                .forUser(userName)
-                .attribute(userAttribute.getName())
+                .forOrganization(organizationName)
+                .attribute(organizationAttribute.getName())
                 .setIncludePermissions(true)
                 .get()
                 .getEntity();
 
-        assertEquals(entity.getValue(), userAttribute.getValue());
+        assertEquals(entity.getValue(), organizationAttribute.getValue());
         assertNotNull(entity.getEmbedded());
     }
 
@@ -89,9 +84,8 @@ public class UserAttributesServiceIT extends RestClientTestUtil {
     public void should_delete_attribute() {
         OperationResult<HypermediaAttribute> operationResult = session
                 .attributesService()
-                .forOrganization(orgName)
-                .forUser(new ClientUser().setUsername(userName))
-                .attribute(userAttribute.getName())
+                .forOrganization(organizationName)
+                .attribute(organizationAttribute.getName())
                 .delete();
 
         assertNotNull(operationResult);
@@ -103,14 +97,12 @@ public class UserAttributesServiceIT extends RestClientTestUtil {
 
         OperationResult<HypermediaAttributesListWrapper> attributes = session
                 .attributesService()
-                .forOrganization(orgName)
-                .forUser(userName)
-                .attributes(asList(userAttributes.getProfileAttributes().get(0).getName(),
-                        userAttributes.getProfileAttributes().get(1).getName()))
-                .createOrUpdate(userAttributes);
+                .forOrganization(organizationName)
+                .attributes(asList(organizationAttributes.getProfileAttributes().get(0).getName(),
+                        organizationAttributes.getProfileAttributes().get(1).getName()))
+                .createOrUpdate(organizationAttributes);
 
         assertNotNull(attributes);
-        assertEquals(javax.ws.rs.core.Response.Status.OK.getStatusCode(), attributes.getResponse().getStatus());
 
     }
 
@@ -118,23 +110,20 @@ public class UserAttributesServiceIT extends RestClientTestUtil {
     public void should_return_server_attributes() {
         List<HypermediaAttribute> attributes = session
                 .attributesService()
-                .forOrganization(orgName)
-                .forUser(userName)
+                .forOrganization(organizationName)
                 .allAttributes()
                 .get()
                 .getEntity()
                 .getProfileAttributes();
 
         assertTrue(attributes.size() >= 2);
-
     }
 
     @Test(dependsOnMethods = "should_return_server_attributes")
     public void should_return_server_attributes_with_permissions() {
         List<HypermediaAttribute> attributes = session
                 .attributesService()
-                .forOrganization(orgName)
-                .forUser(userName)
+                .forOrganization(organizationName)
                 .allAttributes()
                 .setIncludePermissions(true)
                 .get()
@@ -149,47 +138,45 @@ public class UserAttributesServiceIT extends RestClientTestUtil {
     public void should_return_specified_server_attributes() {
         List<HypermediaAttribute> attributes = session
                 .attributesService()
-                .forOrganization(orgName)
-                .forUser(userName)
-                .attributes(asList(userAttributes.getProfileAttributes().get(0).getName(),
-                        userAttributes.getProfileAttributes().get(1).getName()))
+                .forOrganization(organizationName)
+                .attributes(asList(organizationAttributes.getProfileAttributes().get(0).getName(),
+                        organizationAttributes.getProfileAttributes().get(1).getName()))
                 .get()
                 .getEntity()
                 .getProfileAttributes();
 
-        assertTrue(attributes.size() >= 2);
+        assertTrue(attributes.size() == 2);
     }
+
 
 
     @Test(dependsOnMethods = "should_return_specified_server_attributes")
     public void should_return_specified_server_attributes_with_permissions() {
         List<HypermediaAttribute> attributes = session
                 .attributesService()
-                .forOrganization(orgName)
-                .forUser(userName)
-                .attributes(asList(userAttributes.getProfileAttributes().get(0).getName(),
-                        userAttributes.getProfileAttributes().get(1).getName()))
+                .forOrganization(organizationName)
+                .attributes(asList(organizationAttributes.getProfileAttributes().get(0).getName(),
+                        organizationAttributes.getProfileAttributes().get(1).getName()))
                 .setIncludePermissions(true)
                 .get()
                 .getEntity()
                 .getProfileAttributes();
 
-        assertTrue(attributes.size() >= 2);
+        assertTrue(attributes.size() == 2);
         assertTrue(attributes.get(0).getEmbedded() != null);
     }
 
     @Test(dependsOnMethods = "should_return_specified_server_attributes_with_permissions")
     public void should_delete_specified_server_attributes() {
-        OperationResult<HypermediaAttributesListWrapper> entity = session
+        OperationResult<HypermediaAttributesListWrapper> operationResult = session
                 .attributesService()
-                .forOrganization(orgName)
-                .forUser(userName)
-                .attributes(asList(userAttributes.getProfileAttributes().get(0).getName(),
-                        userAttributes.getProfileAttributes().get(1).getName()))
+                .forOrganization(organizationName)
+                .attributes(asList(organizationAttributes.getProfileAttributes().get(0).getName(),
+                        organizationAttributes.getProfileAttributes().get(1).getName()))
                 .delete();
 
-        assertTrue(instanceOf(NullEntityOperationResult.class).matches(entity));
-        assertEquals(Response.Status.NO_CONTENT.getStatusCode(), entity.getResponse().getStatus());
+        assertTrue(instanceOf(NullEntityOperationResult.class).matches(operationResult));
+        assertEquals(Response.Status.NO_CONTENT.getStatusCode(), operationResult.getResponse().getStatus());
     }
 
 
@@ -198,8 +185,7 @@ public class UserAttributesServiceIT extends RestClientTestUtil {
     public void after() {
         session.logout();
         session = null;
-        userAttribute = null;
-        orgName = null;
-        userName = null;
+        organizationName = null;
+        organizationAttribute = null;
     }
 }

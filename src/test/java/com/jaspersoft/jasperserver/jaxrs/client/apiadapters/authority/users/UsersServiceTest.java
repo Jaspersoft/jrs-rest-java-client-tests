@@ -17,7 +17,7 @@ import static org.testng.AssertJUnit.assertTrue;
 /**
  * @author Alexander Krasnyanskiy
  */
-public class UsersServiceIT extends RestClientTestUtil {
+public class UsersServiceTest extends RestClientTestUtil {
 
     private ClientUser user;
     private ClientUser user1;

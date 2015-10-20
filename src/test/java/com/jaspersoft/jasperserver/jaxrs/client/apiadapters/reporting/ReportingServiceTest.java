@@ -19,7 +19,7 @@ import static org.testng.AssertJUnit.assertNotNull;
  * @author Alex Krasnyanskiy
  * @author Tetiana Iefimenko
  */
-public class ReportingServiceIT extends RestClientTestUtil {
+public class ReportingServiceTest extends RestClientTestUtil {
 
 
     @BeforeClass

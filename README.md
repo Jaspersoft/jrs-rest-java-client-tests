@@ -12,6 +12,8 @@ Configuration
 To start working with the test case you should firstly specify Jasperserver URI and others settings in `config.properties` file. Here is example of configuration file:
 ```java
 url=http://localhost:8080/jasperserver-pro
+username=jasperadmin
+password=jasperadmin
 jasperserverVersion=v6_0_0
 authenticationType=SPRING
 logHttp=true

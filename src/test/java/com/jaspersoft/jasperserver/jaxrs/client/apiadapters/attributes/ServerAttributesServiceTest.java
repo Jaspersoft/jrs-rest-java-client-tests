@@ -19,7 +19,7 @@ import static org.testng.AssertJUnit.assertNotNull;
 import static org.testng.AssertJUnit.assertNull;
 import static org.testng.AssertJUnit.assertTrue;
 
-public class ServerAttributesServiceIT extends RestClientTestUtil {
+public class ServerAttributesServiceTest extends RestClientTestUtil {
 
     private HypermediaAttributesListWrapper serverAttributes;
     HypermediaAttribute serverAttribute;

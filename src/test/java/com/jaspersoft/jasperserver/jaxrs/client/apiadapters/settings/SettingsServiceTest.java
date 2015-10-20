@@ -25,7 +25,7 @@ import static junit.framework.Assert.assertTrue;
 /**
  * @author Tetiana Iefimenko
  * */
-public class SettingsServiceIT extends RestClientTestUtil {
+public class SettingsServiceTest extends RestClientTestUtil {
 
     private AnonymousSession session;
 

@@ -16,7 +16,7 @@ import static java.util.Arrays.asList;
 /**
 * Integration tests for {@link ThumbnailsService}
 */
-public class ThumbnailsServiceIT extends RestClientTestUtil {
+public class ThumbnailsServiceTest extends RestClientTestUtil {
 
     @BeforeClass
     public void before() {

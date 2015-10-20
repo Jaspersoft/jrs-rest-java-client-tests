@@ -13,7 +13,7 @@ import static org.testng.AssertJUnit.assertNotNull;
 /**
  * @author Tetiana Iefimenko
  */
-public class JasperserverRestClientIT extends RestClientTestUtil {
+public class JasperserverRestClientTest extends RestClientTestUtil {
 
     @BeforeMethod
     public void before() {

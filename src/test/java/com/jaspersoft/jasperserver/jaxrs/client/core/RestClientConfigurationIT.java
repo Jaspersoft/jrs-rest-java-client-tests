@@ -37,7 +37,7 @@ public class RestClientConfigurationIT extends RestClientTestUtil {
         assertFalse(configuration.getRestrictedHttpMethods());
         assertFalse(configuration.getRestrictedHttpMethods());
         assertFalse(configuration.getRestrictedHttpMethods());
-        assertEquals(configuration.getJasperReportsServerUrl(), "http://localhost:4444/jasperserver-pro");
+        assertEquals(configuration.getJasperReportsServerUrl(), "http://localhost:8080/jasperserver-pro");
         assertEquals(configuration.getJrsVersion(), JRSVersion.v6_1_0);
         assertEquals(configuration.getAuthenticationType(), AuthenticationType.SPRING);
     }

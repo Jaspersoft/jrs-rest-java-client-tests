@@ -19,24 +19,82 @@ import static org.testng.AssertJUnit.assertNotNull;
 import static org.testng.AssertJUnit.assertNull;
 import static org.testng.AssertJUnit.assertTrue;
 
-
-
-public class ServerBatchAttributesServiceIT extends RestClientTestUtil {
+public class ServerAttributesServiceIT extends RestClientTestUtil {
 
     private HypermediaAttributesListWrapper serverAttributes;
+    HypermediaAttribute serverAttribute;
+    private String attrName;
+    private String attrValue;
 
     @BeforeClass
     public void before() {
-        serverAttributes = new HypermediaAttributesListWrapper();
-        serverAttributes.setProfileAttributes(asList(
-                new HypermediaAttribute(new ClientUserAttribute().setName("max_threads").setValue("512")),
-                new HypermediaAttribute(new ClientUserAttribute().setName("admin_cell_phone").setValue("03"))));
-
         initClient();
         initSession();
+        serverAttribute = new HypermediaAttribute();
+        serverAttributes = new HypermediaAttributesListWrapper();
+        serverAttributes.setProfileAttributes(asList(
+                new HypermediaAttribute(new ClientUserAttribute().setName("test_server_attribute_1").setValue("test_value_1")),
+                new HypermediaAttribute(new ClientUserAttribute().setName("test_server_attribute_2").setValue("test_value_2"))));
+
+        attrName = "test_server_attribute";
+        attrValue = "test_value";
     }
 
     @Test
+    public void should_create_single_attribute() {
+
+        serverAttribute.setName(attrName);
+        serverAttribute.setValue(attrValue);
+
+        OperationResult<HypermediaAttribute> operationResult = session
+                .attributesService()
+                .attribute(serverAttribute.getName())
+                .createOrUpdate(serverAttribute);
+
+        HypermediaAttribute entity = operationResult.getEntity();
+
+        assertNotNull(entity);
+        assertEquals(operationResult.getResponse().getStatus(), Response.Status.CREATED.getStatusCode());
+    }
+
+    @Test(dependsOnMethods = "should_create_single_attribute")
+    public void should_return_attribute() {
+        HypermediaAttribute entity = session
+                .attributesService()
+                .attribute(attrName)
+                .get()
+                .getEntity();
+
+        assertEquals(entity.getValue(), attrValue);
+        assertNull(entity.getEmbedded());
+    }
+
+    @Test(dependsOnMethods = "should_return_attribute")
+    public void should_return_attribute_with_permissions() {
+        HypermediaAttribute entity = session
+                .attributesService()
+                .attribute(attrName)
+                .setIncludePermissions(true)
+                .get()
+                .getEntity();
+
+        assertEquals(entity.getValue(), attrValue);
+        assertNotNull(entity.getEmbedded());
+    }
+
+    @Test(dependsOnMethods = "should_return_attribute_with_permissions")
+    public void should_delete_attribute() {
+        OperationResult<HypermediaAttribute> entity = session
+                .attributesService()
+                .attribute(attrName)
+                .delete();
+
+        assertNotNull(entity);
+        assertEquals(Response.Status.NO_CONTENT.getStatusCode(), entity.getResponse().getStatus());
+    }
+
+
+    @Test(dependsOnMethods = "should_delete_attribute")
     public void should_create_attributes() {
 
         OperationResult<HypermediaAttributesListWrapper> attributes = session
@@ -83,7 +141,7 @@ public class ServerBatchAttributesServiceIT extends RestClientTestUtil {
         assertTrue(attributes.get(0).getEmbedded() == null);
     }
 
-    @Test(dependsOnMethods = "should_create_attributes")
+    @Test(dependsOnMethods = "should_return_server_attributes")
     public void should_return_server_attributes_with_permissions() {
         List<HypermediaAttribute> attributes = session
                 .attributesService()
@@ -97,7 +155,7 @@ public class ServerBatchAttributesServiceIT extends RestClientTestUtil {
         assertTrue(attributes.get(0).getEmbedded() != null);
     }
 
-    @Test(dependsOnMethods = "should_return_server_attributes")
+    @Test(dependsOnMethods = "should_return_server_attributes_with_permissions")
     public void should_return_specified_server_attributes() {
         List<HypermediaAttribute> attributes = session
                 .attributesService()
@@ -107,7 +165,7 @@ public class ServerBatchAttributesServiceIT extends RestClientTestUtil {
                 .getEntity()
                 .getProfileAttributes();
 
-        assertTrue(attributes.size() == 2);
+        assertTrue(attributes.size() >= 2);
 
     }
 
@@ -138,5 +196,7 @@ public class ServerBatchAttributesServiceIT extends RestClientTestUtil {
     public void after() {
         session.logout();
         session = null;
+        attrName = null;
+        attrValue = null;
     }
 }

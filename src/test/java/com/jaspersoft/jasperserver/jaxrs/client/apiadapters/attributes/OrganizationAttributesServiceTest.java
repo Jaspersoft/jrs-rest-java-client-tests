@@ -2,7 +2,9 @@ package com.jaspersoft.jasperserver.jaxrs.client.apiadapters.attributes;
 
 import com.jaspersoft.jasperserver.dto.authority.ClientUserAttribute;
 import com.jaspersoft.jasperserver.dto.authority.hypermedia.HypermediaAttribute;
+import com.jaspersoft.jasperserver.dto.authority.hypermedia.HypermediaAttributeEmbeddedContainer;
 import com.jaspersoft.jasperserver.dto.authority.hypermedia.HypermediaAttributesListWrapper;
+import com.jaspersoft.jasperserver.dto.permissions.RepositoryPermission;
 import com.jaspersoft.jasperserver.jaxrs.client.RestClientTestUtil;
 import com.jaspersoft.jasperserver.jaxrs.client.core.operationresult.NullEntityOperationResult;
 import com.jaspersoft.jasperserver.jaxrs.client.core.operationresult.OperationResult;
@@ -14,10 +16,11 @@ import org.testng.annotations.Test;
 
 import static java.util.Arrays.asList;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
-import static org.junit.Assert.assertTrue;
+
 import static org.testng.AssertJUnit.assertEquals;
 import static org.testng.AssertJUnit.assertNotNull;
 import static org.testng.AssertJUnit.assertNull;
+import static org.testng.AssertJUnit.assertTrue;
 
 @Test
 public class OrganizationAttributesServiceTest extends RestClientTestUtil {
@@ -80,7 +83,35 @@ public class OrganizationAttributesServiceTest extends RestClientTestUtil {
         assertNotNull(entity.getEmbedded());
     }
 
+
     @Test(dependsOnMethods = "should_return_attribute_with_permissions")
+    public void should_update_attribute_with_permissions() {
+        organizationAttribute.setDescription("Organization attribute description");
+        organizationAttribute.setPermissionMask(32);
+        organizationAttribute.setSecure(false);
+        organizationAttribute.setInherited(false);
+        organizationAttribute.setHolder("tenant:/" + organizationName);
+        HypermediaAttributeEmbeddedContainer container = new HypermediaAttributeEmbeddedContainer();
+        container.setRepositoryPermissions(
+                asList(new RepositoryPermission().setUri("attr:/organizations/" + organizationName + "/attributes/" + organizationAttribute.getName()).setRecipient("role:/ROLE_ADMINISTRATOR").setMask(32)));
+
+        organizationAttribute.setEmbedded(container);
+
+
+        HypermediaAttribute entity = session
+                .attributesService()
+                .forOrganization(organizationName)
+                .attribute(organizationAttribute.getName())
+                .setIncludePermissions(true)
+                .createOrUpdate(organizationAttribute)
+                .getEntity();
+
+        assertEquals(entity.getValue(), organizationAttribute.getValue());
+        assertNotNull(entity.getEmbedded());
+        assertEquals(new Integer(32), entity.getEmbedded().getRepositoryPermissions().get(0).getMask());
+    }
+
+    @Test(dependsOnMethods = "should_update_attribute_with_permissions")
     public void should_delete_attribute() {
         OperationResult<HypermediaAttribute> operationResult = session
                 .attributesService()
@@ -149,7 +180,6 @@ public class OrganizationAttributesServiceTest extends RestClientTestUtil {
     }
 
 
-
     @Test(dependsOnMethods = "should_return_specified_server_attributes")
     public void should_return_specified_server_attributes_with_permissions() {
         List<HypermediaAttribute> attributes = session
@@ -178,7 +208,6 @@ public class OrganizationAttributesServiceTest extends RestClientTestUtil {
         assertTrue(instanceOf(NullEntityOperationResult.class).matches(operationResult));
         assertEquals(Response.Status.NO_CONTENT.getStatusCode(), operationResult.getResponse().getStatus());
     }
-
 
 
     @AfterClass

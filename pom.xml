@@ -10,14 +10,14 @@
     <name>Integration tests for JasperReports server REST client</name>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <test.properties.dir>src/main/resources</test.properties.dir>
     </properties>
     <dependencies>
         <!--Jasperserver rest client-->
         <dependency>
             <groupId>com.jaspersoft</groupId>
             <artifactId>jrs-rest-java-client</artifactId>
-             <version>6.1.3</version>
-
+            <version>6.1.3</version>
         </dependency>
         <!--Test-->
         <dependency>
@@ -28,6 +28,18 @@
         </dependency>
     </dependencies>
     <build>
+        <resources>
+            <resource>
+                <directory>${test.properties.dir}</directory>
+                <filtering>true</filtering>
+                <excludes>
+                    <exclude>default_test_config.properties</exclude>
+                </excludes>
+            </resource>
+        </resources>
+        <filters>
+            <filter>src/main/resources/default_test_config.properties</filter>
+        </filters>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

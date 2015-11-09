@@ -6,18 +6,27 @@
 
     <groupId>com.jaspersoft</groupId>
     <artifactId>jrs-rest-java-client-tests</artifactId>
-    <version>6.1.3</version>
+    <version>${jrs-rest-java-client.version}</version>
     <name>Integration tests for JasperReports server REST client</name>
+
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <test.properties.dir>src/main/resources</test.properties.dir>
+        <jrs-client.version>6.1.3</jrs-client.version>
     </properties>
+    <repositories>
+        <repository>
+            <id>jrs-ce-releases</id>
+            <name>JasperReports Server CE releases repository</name>
+            <url>http://jaspersoft.artifactoryonline.com/jaspersoft/jaspersoft-clients-releases/</url>
+        </repository>
+    </repositories>
     <dependencies>
         <!--Jasperserver rest client-->
         <dependency>
             <groupId>com.jaspersoft</groupId>
             <artifactId>jrs-rest-java-client</artifactId>
-            <version>6.1.3</version>
+            <version>${jrs-client.version}</version>
         </dependency>
         <!--Test-->
         <dependency>
@@ -50,6 +59,36 @@
                     <testFailureIgnore>true</testFailureIgnore>
                     <useFile>true</useFile>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>1.6</version>
+                <executions>
+                    <execution>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <target>
+                                <echo>Displaying values of properties</echo>
+                                <echo>[jrs-client.version] ${jrs-client.version}</echo>
+                                <echo>[test.properties.dir] ${test.properties.dir}</echo>
+                               <!-- <echo>[username] ${username}</echo>
+                                <echo>[password] ${password}</echo>
+                                <echo>[jasperserverVersion] ${jasperserverVersion}</echo>
+                                <echo>[authenticationType] ${authenticationType}</echo>
+                                <echo>[logHttp] ${logHttp}</echo>
+                                <echo>[logHttpEntity] ${logHttpEntity}</echo>
+                                <echo>[restrictedHttpMethods] ${restrictedHttpMethods}</echo>
+                                <echo>[contentMimeType] ${contentMimeType}</echo>
+                                <echo>[acceptMimeType] ${acceptMimeType}</echo>
+                                <echo>[handleErrors] ${handleErrors}</echo> -->
+                            </target>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>

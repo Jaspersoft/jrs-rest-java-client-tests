@@ -15,7 +15,7 @@ To start working with the test case you should have installed `Oracle/Sun Java J
 ```java
 git clone https://github.com/Jaspersoft/jrs-rest-java-client-tests.git
 ```
-You can skip this step and download source code directly from the main page of repository `https://github.com/Jaspersoft/jrs-rest-java-client-tests`.
+or download source code directly from the main page of repository `https://github.com/Jaspersoft/jrs-rest-java-client-tests`
 2. Run application form command line with default properties:
 ```java
 mvn test
@@ -33,9 +33,9 @@ Full list of variables that can be overridden:
 
 | Variable  | Default value  |
 | :--- | :--- |
-|test.properties.dir|src/main/resources|
+|test.properties.file|src/main/resources/default_test_config.properties|
 | jrs.client.version |v6_1_3|
-| url |superuser|
+| url |http://localhost:8080/jasperserver-pro|
 | username| superuser|
 | password|superuser|
 | connectionTimeout|-|
@@ -65,7 +65,7 @@ contentMimeType=JSON
 acceptMimeType=JSON
 handleErrors=true
 ```
-To Run the tssts with this properties use Maven command:
+To Run the tests with this properties use Maven command:
 ```java
-mvn test -Djrs.client.version=6.1.3 -Dtest.properties.dir="path/to/your/test_config.properties"
+mvn test  -Dtest.properties.file="path/to/your/test_config.properties"
 ```

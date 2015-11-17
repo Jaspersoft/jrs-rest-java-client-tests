@@ -11,8 +11,8 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <test.properties.dir>src/main/resources</test.properties.dir>
-        <jrs-client.version>6.1.3</jrs-client.version>
+        <test.properties.file>src/main/resources/default_test_config.properties</test.properties.file>
+        <jrs.client.version>6.1.3</jrs.client.version>
     </properties>
     <repositories>
         <repository>
@@ -26,7 +26,7 @@
         <dependency>
             <groupId>com.jaspersoft</groupId>
             <artifactId>jrs-rest-java-client</artifactId>
-            <version>${jrs-client.version}</version>
+            <version>${jrs.client.version}</version>
         </dependency>
         <!--Test-->
         <dependency>
@@ -39,7 +39,7 @@
     <build>
         <resources>
             <resource>
-                <directory>${test.properties.dir}</directory>
+                <directory>src/main/resources</directory>
                 <filtering>true</filtering>
                 <excludes>
                     <exclude>default_test_config.properties</exclude>
@@ -47,7 +47,7 @@
             </resource>
         </resources>
         <filters>
-            <filter>src/main/resources/default_test_config.properties</filter>
+            <filter>${test.properties.file}</filter>
         </filters>
         <plugins>
             <plugin>
@@ -73,10 +73,9 @@
                         <configuration>
                             <target>
                                 <echo>Displaying values of properties</echo>
-                                <echo>[jrs-client.version] ${jrs-client.version}</echo>
-                                <echo>[test.properties.dir] ${test.properties.dir}</echo>
-                               <!-- <echo>[username] ${username}</echo>
-                                <echo>[password] ${password}</echo>
+                                <echo>[jrs-client.version] ${jrs.client.version}</echo>
+                                <echo>[test.properties.file] ${test.properties.file}</echo>
+                              <!--  <echo>[password] ${password}</echo>
                                 <echo>[jasperserverVersion] ${jasperserverVersion}</echo>
                                 <echo>[authenticationType] ${authenticationType}</echo>
                                 <echo>[logHttp] ${logHttp}</echo>

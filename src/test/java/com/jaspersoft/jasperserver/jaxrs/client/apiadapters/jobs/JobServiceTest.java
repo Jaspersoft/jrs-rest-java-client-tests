@@ -34,6 +34,7 @@ public class JobServiceTest extends RestClientTestUtil{
 
     @Test
     public void should_scheduled_report() {
+        // Given
         Job job = new Job();
         job.setLabel("New Job for ISS Report");
         job.setDescription("New Job for the report template: " + reportUri);
@@ -67,12 +68,14 @@ public class JobServiceTest extends RestClientTestUtil{
         job.setTrigger(trigger);
         job.setBaseOutputFilename("Cascading_multi_select_topic" + System.currentTimeMillis());
 
+        // When
         OperationResult<Job> result = session
                 .jobsService()
                 .scheduleReport(job);
 
         job = result.getEntity();
 
+        // Then
         assertNotNull(job.getSource().getParameters());
         assertEquals(parameterValues.get("Country_multi_select"), ((ArrayList) job.getSource().getParameters().get("Country_multi_select")).toArray());
         assertEquals(parameterValues.get("Cascading_name_single_select"), ((ArrayList) job.getSource().getParameters().get("Cascading_name_single_select")).toArray());

@@ -1,17 +1,23 @@
 package com.jaspersoft.jasperserver.jaxrs.client.apiadapters.reporting;
 
+import com.jaspersoft.jasperserver.dto.reports.ReportParameter;
+import com.jaspersoft.jasperserver.dto.reports.ReportParameters;
 import com.jaspersoft.jasperserver.jaxrs.client.RestClientTestUtil;
 import com.jaspersoft.jasperserver.jaxrs.client.core.operationresult.OperationResult;
+import com.jaspersoft.jasperserver.jaxrs.client.dto.reports.ExportDescriptor;
 import com.jaspersoft.jasperserver.jaxrs.client.dto.reports.ReportExecutionDescriptor;
 import com.jaspersoft.jasperserver.jaxrs.client.dto.reports.ReportExecutionRequest;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.LinkedList;
+import java.util.List;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import static java.util.Arrays.asList;
 import static org.testng.AssertJUnit.assertNotNull;
 
 
@@ -31,7 +37,7 @@ public class ReportingServiceTest extends RestClientTestUtil {
     @Test
     public void should_return_proper_entity_if_pass_pdf_report_output_format() {
 
-        /** When **/
+        // When
         OperationResult<InputStream> result = session
                 .reportingService()
                 .report("/organizations/organization_1/adhoc/topics/Cascading_multi_select_topic")
@@ -43,14 +49,14 @@ public class ReportingServiceTest extends RestClientTestUtil {
                 .run();
 
         InputStream entity = result.getEntity();
-        /** Then **/
+        // Then
         assertNotNull(entity);
     }
 
     @Test
     public void should_return_proper_entity_() {
 
-        /** When **/
+        // When
         OperationResult<InputStream> result = client
                 .authenticate("superuser", "superuser")
                 .reportingService()
@@ -60,14 +66,14 @@ public class ReportingServiceTest extends RestClientTestUtil {
                 .parameter("Cascading_state_multi_select", "OR", "WA")
                 .run();
         InputStream entity = result.getEntity();
-        /** Then **/
+        // Then
         assertNotNull(entity);
     }
 
     @Test
     public void should_return_proper_entity_if_passed_number_of_pages_zero() {
 
-        /** When **/
+        // When
         OperationResult<InputStream> result = session
                 .reportingService()
                 .report("/organizations/organization_1/adhoc/topics/Cascading_multi_select_topic")
@@ -79,14 +85,14 @@ public class ReportingServiceTest extends RestClientTestUtil {
                 .run();
 
         InputStream entity = result.getEntity();
-        /** Then **/
+        // Then
         assertNotNull(entity);
 
     }
     @Test
     public void should_return_proper_entity_if_pass_string_output_format() {
 
-        /** When **/
+        // When
         OperationResult<InputStream> result = session
                 .reportingService()
                 .report("/organizations/organization_1/adhoc/topics/Cascading_multi_select_topic")
@@ -97,7 +103,7 @@ public class ReportingServiceTest extends RestClientTestUtil {
                 .run();
 
         InputStream entity = result.getEntity();
-        /** Then **/
+        // Then
         assertNotNull(entity);
 
     }
@@ -105,7 +111,7 @@ public class ReportingServiceTest extends RestClientTestUtil {
     @Test
     public void should_return_proper_entity_if_passed_wrong_number_of_pages() {
 
-        /** When **/
+        // When
         OperationResult<InputStream> result = session
                 .reportingService()
                 .report("/organizations/organization_1/adhoc/topics/Cascading_multi_select_topic")
@@ -116,7 +122,7 @@ public class ReportingServiceTest extends RestClientTestUtil {
                 .run();
 
         InputStream entity = result.getEntity();
-        /** Then **/
+        // Then
         assertNotNull(entity);
 
     }
@@ -124,7 +130,7 @@ public class ReportingServiceTest extends RestClientTestUtil {
     @Test
     public void should_return_proper_entity_if_passed_all_wrong_number_of_pages() {
 
-        /** When **/
+        // When
         OperationResult<InputStream> result = session
                 .reportingService()
                 .report("/organizations/organization_1/adhoc/topics/Cascading_multi_select_topic")
@@ -135,7 +141,7 @@ public class ReportingServiceTest extends RestClientTestUtil {
                 .run();
 
         InputStream entity = result.getEntity();
-        /** Then **/
+        // Then
         assertNotNull(entity);
 
     }
@@ -143,7 +149,7 @@ public class ReportingServiceTest extends RestClientTestUtil {
     @Test
     public void should_return_proper_entity_without_numbers_of_pages() {
 
-        /** When **/
+        // When
         OperationResult<InputStream> result = session
                 .reportingService()
                 .report("/organizations/organization_1/adhoc/topics/Cascading_multi_select_topic")
@@ -154,14 +160,14 @@ public class ReportingServiceTest extends RestClientTestUtil {
                 .run();
 
         InputStream entity = result.getEntity();
-        /** Then **/
+        // Then
         assertNotNull(entity);
     }
 
     @Test
     public void should_return_proper_entity_with_page_range() {
 
-        /** When **/
+        // When
         OperationResult<InputStream> result = session
                 .reportingService()
                 .report("/organizations/organization_1/adhoc/topics/Cascading_multi_select_topic")
@@ -172,7 +178,7 @@ public class ReportingServiceTest extends RestClientTestUtil {
                 .run();
 
         InputStream entity = result.getEntity();
-        /** Then **/
+        // Then
         assertNotNull(entity);
 
     }
@@ -180,7 +186,7 @@ public class ReportingServiceTest extends RestClientTestUtil {
     @Test
     public void should_return_proper_entity_in_async_mode() {
 
-        /** When **/
+        // When
         ReportExecutionRequest request = new ReportExecutionRequest();
         request.setReportUnitUri("/organizations/organization_1/adhoc/topics/Cascading_multi_select_topic");
         request
@@ -192,14 +198,14 @@ public class ReportingServiceTest extends RestClientTestUtil {
                 .newReportExecutionRequest(request);
 
         ReportExecutionDescriptor reportExecutionDescriptor = operationResult.getEntity();
-        /** Then **/
+        // Then
         assertNotNull(reportExecutionDescriptor);
     }
 
     @Test
     public void should_return_proper_entity_in_async_mode_if_format_is_string() {
 
-        /** When **/
+        // When
         ReportExecutionRequest request = new ReportExecutionRequest();
         request.setReportUnitUri("/organizations/organization_1/adhoc/topics/Cascading_multi_select_topic");
         request
@@ -211,8 +217,52 @@ public class ReportingServiceTest extends RestClientTestUtil {
                 .newReportExecutionRequest(request);
 
         ReportExecutionDescriptor reportExecutionDescriptor = operationResult.getEntity();
-        /** Then **/
+        // Then
         assertNotNull(reportExecutionDescriptor);
+    }
+
+    @Test
+    public void should_export_report_to_xls_in_async_mode() {
+        // Given
+        ReportingService reportingService = session.reportingService();
+
+        ReportExecutionRequest request = new ReportExecutionRequest();
+        ReportParameters reportParameters = new ReportParameters(new LinkedList<ReportParameter>());
+        reportParameters.getReportParameters().add(new ReportParameter().setName("Cascading_state_multi_select").setValues(asList("CA")));
+        reportParameters.getReportParameters().add(new ReportParameter().setName("Cascading_name_single_select").setValues(asList("Adams-Steen Transportation Holdings\"")));
+        reportParameters.getReportParameters().add(new ReportParameter().setName("Country_multi_select").setValues(asList("USA")));
+        request
+                .setOutputFormat(ReportOutputFormat.XLS)
+                .setParameters(reportParameters)
+                .setPages("1")
+                .setReportUnitUri("/organizations/organization_1/adhoc/topics/Cascading_multi_select_topic")
+                .setAsync(true);
+
+        // When
+        OperationResult<ReportExecutionDescriptor> operationResult = reportingService.newReportExecutionRequest(request);
+
+        ReportExecutionDescriptor reportExecutionDescriptor = operationResult.getEntity();
+
+        OperationResult<ReportExecutionDescriptor> executionDetails = reportingService.reportExecutionRequest(reportExecutionDescriptor.getRequestId()).executionDetails();
+
+        ReportExecutionDescriptor descriptor = executionDetails.getEntity();
+        while (!descriptor.getStatus().equals("ready"))
+        {
+            executionDetails = reportingService.reportExecutionRequest(reportExecutionDescriptor.getRequestId()).executionDetails();
+            descriptor = executionDetails.getEntity();
+        }
+
+        final ReportExecutionRequestBuilder reportExecutionRequest = reportingService.reportExecutionRequest(descriptor.getRequestId());
+        final List<ExportDescriptor> exports = descriptor.getExports();
+        OperationResult<InputStream> reportOutput = null;
+        if (exports != null && exports.size() > 0)
+        {
+            final String exportId = exports.get(0).getId();
+            final ExportExecutionRequestBuilder export = reportExecutionRequest.export(exportId);
+            reportOutput = export.outputResource();
+        }
+        // Then
+        assertNotNull(reportOutput);
     }
 
     @AfterClass
@@ -220,10 +270,10 @@ public class ReportingServiceTest extends RestClientTestUtil {
         session.logout();
     }
 
-    private void reportToPdf(InputStream entity) {
+    private void reportToFile(InputStream entity, String filename) {
         OutputStream output = null;
         try {
-            output = new FileOutputStream("file.pdf");
+            output = new FileOutputStream(filename);
             int i = 0;
             while (i != -1) {
                 i = entity.read();

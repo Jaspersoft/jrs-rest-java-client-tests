@@ -28,12 +28,13 @@ public class InputControlsServiceTest extends RestClientTestUtil {
 
     @Test
     public void should_return_input_controls_structure_for_report() {
+        // When
         OperationResult<ReportInputControlsListWrapper> operationResult = session
                 .inputControlsService()
                 .inputControls()
                 .container("/organizations/organization_1/adhoc/topics/Cascading_multi_select_topic")
                 .get();
-
+        // Then
         assertNotNull(operationResult);
         assertNotNull(operationResult.getEntity());
         assertTrue(operationResult.getEntity().getInputParameters().size() > 0);
@@ -42,7 +43,7 @@ public class InputControlsServiceTest extends RestClientTestUtil {
 
     @Test(enabled = false)
     public void should_reorder_input_controls_structure_for_report() {
-
+        // When
         OperationResult<ReportInputControlsListWrapper> operationResult = session
                 .inputControlsService()
                 .inputControls()
@@ -62,7 +63,7 @@ public class InputControlsServiceTest extends RestClientTestUtil {
                 .container("/organizations/organization_1/adhoc/topics/Cascading_multi_select_topic")
                 .reorder(inputParameters);
 
-
+        // Then
         assertNotNull(operationResult);
         assertNotNull(result);
         assertEquals(inputParameters.get(0), reorderedOperationResult.getEntity().getInputParameters().get(0));
@@ -71,13 +72,14 @@ public class InputControlsServiceTest extends RestClientTestUtil {
 
     @Test(dependsOnMethods = "should_return_input_controls_structure_for_report")
     public void should_return_input_controls_structure_for_report_without_state() {
+        // When
         OperationResult<ReportInputControlsListWrapper> operationResult = session
                 .inputControlsService()
                 .inputControls()
                 .container("/organizations/organization_1/adhoc/topics/Cascading_multi_select_topic")
                 .excludeState(true)
                 .get();
-
+        // Then
         assertNotNull(operationResult);
         assertNotNull(operationResult.getEntity());
         assertTrue(operationResult.getEntity().getInputParameters().size() > 0);
@@ -86,13 +88,14 @@ public class InputControlsServiceTest extends RestClientTestUtil {
 
     @Test(dependsOnMethods = "should_return_input_controls_structure_for_report_without_state")
     public void should_return_input_controls_values_for_report() {
+        // When
         OperationResult<InputControlStateListWrapper> operationResult = session
                 .inputControlsService()
                 .inputControls()
                 .container("/organizations/organization_1/adhoc/topics/Cascading_multi_select_topic")
                 .values()
                 .get();
-
+        // Then
         assertNotNull(operationResult);
         assertNotNull(operationResult.getEntity());
         assertTrue(operationResult.getEntity().getInputControlStateList().size() > 0);
@@ -101,6 +104,7 @@ public class InputControlsServiceTest extends RestClientTestUtil {
 
     @Test//(dependsOnMethods = "should_return_input_controls_values_for_report")
     public void should_update_input_controls_values_for_report() {
+        // When
         OperationResult<InputControlStateListWrapper> operationResult = session
                 .inputControlsService()
                 .inputControls()
@@ -109,7 +113,7 @@ public class InputControlsServiceTest extends RestClientTestUtil {
                 .parameter("Country_multi_select", "Mexico")
                 .parameter("Cascading_state_multi_select", "Guerrero", "Sinaloa")
                 .run();
-
+        // Then
         assertNotNull(operationResult);
         assertNotNull(operationResult.getEntity());
         assertTrue(operationResult.getEntity().getInputControlStateList().size() == 2);
@@ -118,6 +122,7 @@ public class InputControlsServiceTest extends RestClientTestUtil {
 
     @Test//(dependsOnMethods = "should_update_input_controls_values_for_report")
     public void should_update_input_controls_values_for_report_and_return_full_structure() {
+        // When
         OperationResult<InputControlStateListWrapper> operationResult = session
                 .inputControlsService()
                 .inputControls()
@@ -127,7 +132,7 @@ public class InputControlsServiceTest extends RestClientTestUtil {
                 .parameter("Cascading_state_multi_select", "CA", "OR", "WA")
                 .includeFullStructure(true)
                 .run();
-
+        // Then
         assertNotNull(operationResult);
         assertNotNull(operationResult.getEntity());
         assertTrue(operationResult.getEntity().getInputControlStateList().size() > 2);
@@ -136,6 +141,7 @@ public class InputControlsServiceTest extends RestClientTestUtil {
 
     @Test(dependsOnMethods = "should_update_input_controls_values_for_report_and_return_full_structure")
     public void should_return_input_controls_values_for_report_with_fresh_data() {
+        // When
         OperationResult<InputControlStateListWrapper> operationResult = session
                 .inputControlsService()
                 .inputControls()
@@ -143,7 +149,7 @@ public class InputControlsServiceTest extends RestClientTestUtil {
                 .values()
                 .useCashedData(false)
                 .get();
-
+        // Then
         assertNotNull(operationResult);
         assertNotNull(operationResult.getEntity());
         assertTrue(operationResult.getEntity().getInputControlStateList().size() > 0);

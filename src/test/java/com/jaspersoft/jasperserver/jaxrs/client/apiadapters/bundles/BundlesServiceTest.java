@@ -2,10 +2,13 @@ package com.jaspersoft.jasperserver.jaxrs.client.apiadapters.bundles;
 
 import com.jaspersoft.jasperserver.jaxrs.client.RestClientTestUtil;
 import com.jaspersoft.jasperserver.jaxrs.client.core.AnonymousSession;
-import java.util.Locale;
-import java.util.Map;
+import com.jaspersoft.jasperserver.jaxrs.client.core.operationresult.OperationResult;
+import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
+
+import java.util.Locale;
+import java.util.Map;
 
 import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertNotNull;
@@ -156,4 +159,20 @@ public class BundlesServiceTest extends RestClientTestUtil {
         assertFalse(bundle.size() == 0);
         assertTrue(bundle.containsKey("logCollectors.form.resourceUri.hint"));
     }
+
+    /**
+     * Platform specific test, fails on JBoss 8
+     */
+    @Test
+    public void test_verifyReturnsResultsForEmptyLocale(){
+        OperationResult<Map<String, Map<String, String>>> result = client
+                .getAnonymousSession()
+                .bundlesService()
+                .forLocale(new Locale(""))
+                .allBundles();
+        Assert.assertEquals(result.getResponseStatus(), 200);
+        Assert.assertNotNull(result.getEntity());
+        Assert.assertFalse(result.getEntity().isEmpty());
+    }
+
 }

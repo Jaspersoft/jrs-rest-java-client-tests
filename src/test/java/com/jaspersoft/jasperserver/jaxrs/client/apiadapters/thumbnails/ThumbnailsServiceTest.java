@@ -17,7 +17,7 @@ import org.testng.annotations.Test;
 import static java.util.Arrays.asList;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
-import static org.testng.AssertJUnit.assertTrue;
+import static org.testng.Assert.assertTrue;
 
 /**
 * Integration tests for {@link ThumbnailsService}

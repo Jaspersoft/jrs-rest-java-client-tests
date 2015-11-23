@@ -16,12 +16,10 @@ import org.testng.annotations.Test;
 
 import static java.util.Arrays.asList;
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertTrue;
 
-/**
-* Integration tests for {@link ThumbnailsService}
-*/
 public class ThumbnailsServiceTest extends RestClientTestUtil {
 
     @BeforeClass
@@ -31,9 +29,6 @@ public class ThumbnailsServiceTest extends RestClientTestUtil {
     }
 
     @Test
-    /**
-     * Batch thumbnails operation
-     */
     public void should_return_list_of_thumbnails_with_default_request_method() {
         // When
         List<ResourceThumbnail> entity = session.thumbnailsService()
@@ -47,12 +42,30 @@ public class ThumbnailsServiceTest extends RestClientTestUtil {
         // Then
         assertNotNull(entity);
         assertTrue(entity.size() == 2);
+        assertFalse(entity.get(0).getThumbnailData().isEmpty());
+        assertFalse(entity.get(1).getThumbnailData().isEmpty());
+    }
+
+
+    @Test
+    public void should_return_list_of_thumbnails_with_default_request_method_without_default_image() {
+        // When
+        List<ResourceThumbnail> entity = session.thumbnailsService()
+                .thumbnails()
+                .reports("/public/Samples/Reports/08g.UnitSalesDetailReport",
+                        "/public/Samples/Reports/11g.SalesByMonthReport")
+                .defaultAllowed(false)
+                .get()
+                .getEntity()
+                .getThumbnails();
+        // Then
+        assertNotNull(entity);
+        assertTrue(entity.size() == 2);
+        assertFalse(entity.get(0).getThumbnailData().isEmpty());
+        assertFalse(entity.get(1).getThumbnailData().isEmpty());
     }
 
     @Test
-    /**
-     * Batch thumbnails operation
-     */
     public void should_return_list_of_thumbnails_with_get_request_method() {
         // When
         List<ResourceThumbnail> entity = session.thumbnailsService()
@@ -66,18 +79,48 @@ public class ThumbnailsServiceTest extends RestClientTestUtil {
         // Then
         assertNotNull(entity);
         assertTrue(entity.size() == 2);
+        assertFalse(entity.get(0).getThumbnailData().isEmpty());
+        assertFalse(entity.get(1).getThumbnailData().isEmpty());
     }
 
     @Test
-    /**
-     * Single thumbnail operation
-     */
+    public void should_return_list_of_thumbnails_with_get_request_method_without_default_image() {
+        // When
+        List<ResourceThumbnail> entity = session.thumbnailsService()
+                .thumbnails()
+                .reports(asList("/public/Samples/Reports/08g.UnitSalesDetailReport",
+                        "/public/Samples/Reports/11g.SalesByMonthReport"))
+                .defaultAllowed(false).requestMethod(RequestMethod.GET)
+                .get()
+                .getEntity()
+                .getThumbnails();
+        // Then
+        assertNotNull(entity);
+        assertTrue(entity.size() == 2);
+        assertFalse(entity.get(0).getThumbnailData().isEmpty());
+        assertFalse(entity.get(1).getThumbnailData().isEmpty());
+    }
+
+    @Test
     public void should_return_single_thumbnail_as_stream() throws IOException {
         // When
         InputStream entity = session.thumbnailsService()
                 .thumbnail()
                 .report("/public/Samples/Reports/08g.UnitSalesDetailReport")
                 .defaultAllowed(true)
+                .get()
+                .getEntity();
+        // Then
+        assertNotNull(entity);
+    }
+
+    @Test
+    public void should_return_single_thumbnail_as_stream_without_default_image() throws IOException {
+        // When
+        InputStream entity = session.thumbnailsService()
+                .thumbnail()
+                .report("/public/Samples/Reports/11g.SalesByMonthReport")
+                .defaultAllowed(false)
                 .get()
                 .getEntity();
         // Then

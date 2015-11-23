@@ -3,16 +3,15 @@ package com.jaspersoft.jasperserver.jaxrs.client.apiadapters.bundles;
 import com.jaspersoft.jasperserver.jaxrs.client.RestClientTestUtil;
 import com.jaspersoft.jasperserver.jaxrs.client.core.AnonymousSession;
 import com.jaspersoft.jasperserver.jaxrs.client.core.operationresult.OperationResult;
-import org.testng.Assert;
+import java.util.Locale;
+import java.util.Map;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import java.util.Locale;
-import java.util.Map;
-
-import static junit.framework.Assert.assertFalse;
-import static junit.framework.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertTrue;
+import static org.testng.AssertJUnit.assertEquals;
 
 /**
  * @author Tetiana Iefimenko
@@ -165,14 +164,16 @@ public class BundlesServiceTest extends RestClientTestUtil {
      */
     @Test
     public void test_verifyReturnsResultsForEmptyLocale(){
+        // When
         OperationResult<Map<String, Map<String, String>>> result = client
                 .getAnonymousSession()
                 .bundlesService()
                 .forLocale(new Locale(""))
                 .allBundles();
-        Assert.assertEquals(result.getResponseStatus(), 200);
-        Assert.assertNotNull(result.getEntity());
-        Assert.assertFalse(result.getEntity().isEmpty());
+        // Then
+        assertEquals(result.getResponseStatus(), 200);
+        assertNotNull(result.getEntity());
+        assertFalse(result.getEntity().isEmpty());
     }
 
 }

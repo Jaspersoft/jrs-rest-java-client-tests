@@ -35,7 +35,7 @@ public class ReportingServiceTest extends RestClientTestUtil {
     }
 
     @Test
-    public void should_return_proper_entity_if_pass_pdf_report_output_format() {
+    public void should_return_proper_entity_for_pdf_report_output_format() {
 
         // When
         OperationResult<InputStream> result = session
@@ -54,7 +54,27 @@ public class ReportingServiceTest extends RestClientTestUtil {
     }
 
     @Test
-    public void should_return_proper_entity_() {
+    public void should_return_proper_entity_for_csv_report_output_format() {
+
+        // When
+        OperationResult<InputStream> result = session
+                .reportingService()
+                .report("/organizations/organization_1/adhoc/topics/Cascading_multi_select_topic")
+                .prepareForRun("csv", 1)
+                .parameter("Cascading_state_multi_select", "CA")
+                .parameter("Cascading_state_multi_select", "OR", "WA")
+                .parameter("Cascading_name_single_select", "Adams-Steen Transportation Holdings")
+                .parameter("Country_multi_select", "USA")
+                .run();
+
+        InputStream entity = result.getEntity();
+        // Then
+        assertNotNull(entity);
+
+    }
+
+    @Test
+    public void should_return_proper_entity() {
 
         // When
         OperationResult<InputStream> result = client
@@ -115,7 +135,7 @@ public class ReportingServiceTest extends RestClientTestUtil {
         OperationResult<InputStream> result = session
                 .reportingService()
                 .report("/organizations/organization_1/adhoc/topics/Cascading_multi_select_topic")
-                .prepareForRun("PDF", 0,-1,1)
+                .prepareForRun("PDF", 0, -1, 1)
                 .parameter("Cascading_state_multi_select", "CA")
                 .parameter("Cascading_name_single_select", "Adams-Steen Transportation Holdings")
                 .parameter("Country_multi_select", "USA")
@@ -134,7 +154,7 @@ public class ReportingServiceTest extends RestClientTestUtil {
         OperationResult<InputStream> result = session
                 .reportingService()
                 .report("/organizations/organization_1/adhoc/topics/Cascading_multi_select_topic")
-                .prepareForRun("PDF", 0,-1)
+                .prepareForRun("PDF", 0, -1)
                 .parameter("Cascading_state_multi_select", "CA")
                 .parameter("Cascading_name_single_select", "Adams-Steen Transportation Holdings")
                 .parameter("Country_multi_select", "USA")
@@ -147,7 +167,7 @@ public class ReportingServiceTest extends RestClientTestUtil {
     }
 
     @Test
-    public void should_return_proper_entity_without_numbers_of_pages() {
+    public void should_return_proper_entity_without_numbers_of_pages_for_pdf() {
 
         // When
         OperationResult<InputStream> result = session
@@ -162,6 +182,25 @@ public class ReportingServiceTest extends RestClientTestUtil {
         InputStream entity = result.getEntity();
         // Then
         assertNotNull(entity);
+    }
+
+    @Test
+    public void should_return_proper_entity_with_page_range_for_csv() {
+
+        // When
+        OperationResult<InputStream> result = session
+                .reportingService()
+                .report("/organizations/organization_1/adhoc/topics/Cascading_multi_select_topic")
+                .prepareForRun(ReportOutputFormat.CSV)
+                .parameter("Cascading_state_multi_select", "CA")
+                .parameter("Cascading_name_single_select", "Adams-Steen Transportation Holdings")
+                .parameter("Country_multi_select", "USA")
+                .run();
+
+        InputStream entity = result.getEntity();
+        // Then
+        assertNotNull(entity);
+
     }
 
     @Test
@@ -184,7 +223,7 @@ public class ReportingServiceTest extends RestClientTestUtil {
     }
 
     @Test
-    public void should_return_proper_entity_in_async_mode() {
+    public void should_return_proper_entity_in_async_mode_for_pdf() {
 
         // When
         ReportExecutionRequest request = new ReportExecutionRequest();
@@ -265,12 +304,89 @@ public class ReportingServiceTest extends RestClientTestUtil {
         assertNotNull(reportOutput);
     }
 
-    @AfterClass
-    public void after() {
-        session.logout();
+
+    @Test
+    public void should_export_report_to_csv_in_async_mode() {
+        // Given
+        ReportingService reportingService = session.reportingService();
+
+        ReportExecutionRequest request = new ReportExecutionRequest();
+        ReportParameters reportParameters = new ReportParameters(new LinkedList<ReportParameter>());
+        reportParameters.getReportParameters().add(new ReportParameter().setName("Cascading_state_multi_select").setValues(asList("CA")));
+        reportParameters.getReportParameters().add(new ReportParameter().setName("Cascading_name_single_select").setValues(asList("Adams-Steen Transportation Holdings\"")));
+        reportParameters.getReportParameters().add(new ReportParameter().setName("Country_multi_select").setValues(asList("USA")));
+        request
+                .setOutputFormat(ReportOutputFormat.CSV)
+                .setParameters(reportParameters)
+                .setPages("1")
+                .setReportUnitUri("/organizations/organization_1/adhoc/topics/Cascading_multi_select_topic")
+                .setAsync(true);
+
+        // When
+        OperationResult<ReportExecutionDescriptor> operationResult = reportingService.newReportExecutionRequest(request);
+
+        ReportExecutionDescriptor reportExecutionDescriptor = operationResult.getEntity();
+
+        OperationResult<ReportExecutionDescriptor> executionDetails = reportingService.reportExecutionRequest(reportExecutionDescriptor.getRequestId()).executionDetails();
+
+        ReportExecutionDescriptor descriptor = executionDetails.getEntity();
+
+         ReportExecutionRequestBuilder reportExecutionRequest = reportingService.reportExecutionRequest(descriptor.getRequestId());
+         List<ExportDescriptor> exports = descriptor.getExports();
+        OperationResult<InputStream> reportOutput = null;
+        if (exports != null && exports.size() > 0)
+        {
+            final String exportId = exports.get(0).getId();
+            final ExportExecutionRequestBuilder export = reportExecutionRequest.export(exportId);
+            reportOutput = export.outputResource();
+        }
+        // Then
+        assertNotNull(reportOutput);
+
     }
 
-    private void reportToFile(InputStream entity, String filename) {
+    @Test
+    public void should_export_report_to_csv_in_async_mode_when_format_as_string() {
+        // Given
+        ReportingService reportingService = session.reportingService();
+
+        ReportExecutionRequest request = new ReportExecutionRequest();
+        ReportParameters reportParameters = new ReportParameters(new LinkedList<ReportParameter>());
+        reportParameters.getReportParameters().add(new ReportParameter().setName("Cascading_state_multi_select").setValues(asList("CA")));
+        reportParameters.getReportParameters().add(new ReportParameter().setName("Cascading_name_single_select").setValues(asList("Adams-Steen Transportation Holdings\"")));
+        reportParameters.getReportParameters().add(new ReportParameter().setName("Country_multi_select").setValues(asList("USA")));
+        request
+                .setOutputFormat("csv")
+                .setParameters(reportParameters)
+                .setPages("1")
+                .setReportUnitUri("/organizations/organization_1/adhoc/topics/Cascading_multi_select_topic")
+                .setAsync(true);
+
+        // When
+        OperationResult<ReportExecutionDescriptor> operationResult = reportingService.newReportExecutionRequest(request);
+
+        ReportExecutionDescriptor reportExecutionDescriptor = operationResult.getEntity();
+
+        OperationResult<ReportExecutionDescriptor> executionDetails = reportingService.reportExecutionRequest(reportExecutionDescriptor.getRequestId()).executionDetails();
+
+        ReportExecutionDescriptor descriptor = executionDetails.getEntity();
+
+         ReportExecutionRequestBuilder reportExecutionRequest = reportingService.reportExecutionRequest(descriptor.getRequestId());
+         List<ExportDescriptor> exports = descriptor.getExports();
+        OperationResult<InputStream> reportOutput = null;
+        if (exports != null && exports.size() > 0)
+        {
+            final String exportId = exports.get(0).getId();
+            final ExportExecutionRequestBuilder export = reportExecutionRequest.export(exportId);
+            reportOutput = export.outputResource();
+        }
+        // Then
+        assertNotNull(reportOutput);
+
+    }
+
+
+    protected void reportToFile(InputStream entity, String filename) {
         OutputStream output = null;
         try {
             output = new FileOutputStream(filename);
@@ -293,4 +409,11 @@ public class ReportingServiceTest extends RestClientTestUtil {
             }
         }
     }
+
+    @AfterClass
+    public void after() {
+        session.logout();
+    }
+
+
 }

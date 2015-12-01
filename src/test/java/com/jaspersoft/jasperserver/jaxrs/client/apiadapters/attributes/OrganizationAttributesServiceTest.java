@@ -1,6 +1,6 @@
 package com.jaspersoft.jasperserver.jaxrs.client.apiadapters.attributes;
 
-import com.jaspersoft.jasperserver.dto.authority.ClientUserAttribute;
+import com.jaspersoft.jasperserver.dto.authority.ClientAttribute;
 import com.jaspersoft.jasperserver.dto.authority.hypermedia.HypermediaAttribute;
 import com.jaspersoft.jasperserver.dto.authority.hypermedia.HypermediaAttributeEmbeddedContainer;
 import com.jaspersoft.jasperserver.dto.authority.hypermedia.HypermediaAttributesListWrapper;
@@ -16,7 +16,6 @@ import org.testng.annotations.Test;
 
 import static java.util.Arrays.asList;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
-
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertNull;
@@ -33,8 +32,8 @@ public class OrganizationAttributesServiceTest extends RestClientTestUtil {
     public void before() {
         organizationAttributes = new HypermediaAttributesListWrapper();
         organizationAttributes.setProfileAttributes(asList(
-                new HypermediaAttribute(new ClientUserAttribute().setName("test_org_attr_1").setValue("test_value")),
-                new HypermediaAttribute(new ClientUserAttribute().setName("test_org_attr_2").setValue("test_value"))));
+                new HypermediaAttribute(new ClientAttribute().setName("test_org_attr_1").setValue("test_value")),
+                new HypermediaAttribute(new ClientAttribute().setName("test_org_attr_2").setValue("test_value"))));
         organizationAttribute = new HypermediaAttribute();
         organizationAttribute.setName("test_org_attr");
         organizationAttribute.setValue("test_value");

@@ -7,10 +7,7 @@ import com.jaspersoft.jasperserver.jaxrs.client.core.operationresult.OperationRe
 import com.jaspersoft.jasperserver.jaxrs.client.dto.reports.ExportDescriptor;
 import com.jaspersoft.jasperserver.jaxrs.client.dto.reports.ReportExecutionDescriptor;
 import com.jaspersoft.jasperserver.jaxrs.client.dto.reports.ReportExecutionRequest;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.LinkedList;
 import java.util.List;
 import org.testng.annotations.AfterClass;
@@ -385,30 +382,6 @@ public class ReportingServiceTest extends RestClientTestUtil {
 
     }
 
-
-    protected void reportToFile(InputStream entity, String filename) {
-        OutputStream output = null;
-        try {
-            output = new FileOutputStream(filename);
-            int i = 0;
-            while (i != -1) {
-                i = entity.read();
-                output.write(i);
-                output.flush();
-
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-
-            try {
-                entity.close();
-                output.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
 
     @AfterClass
     public void after() {

@@ -1,7 +1,7 @@
 package com.jaspersoft.jasperserver.jaxrs.client.apiadapters.attributes;
 
+import com.jaspersoft.jasperserver.dto.authority.ClientAttribute;
 import com.jaspersoft.jasperserver.dto.authority.ClientUser;
-import com.jaspersoft.jasperserver.dto.authority.ClientUserAttribute;
 import com.jaspersoft.jasperserver.dto.authority.hypermedia.HypermediaAttribute;
 import com.jaspersoft.jasperserver.dto.authority.hypermedia.HypermediaAttributesListWrapper;
 import com.jaspersoft.jasperserver.jaxrs.client.RestClientTestUtil;
@@ -33,8 +33,8 @@ public class UserAttributesServiceTest extends RestClientTestUtil {
         userAttribute.setValue("test_value");
         userAttributes = new HypermediaAttributesListWrapper();
         userAttributes.setProfileAttributes(asList(
-                new HypermediaAttribute(new ClientUserAttribute().setName("test_user_attribute_1").setValue("test_value_1")),
-                new HypermediaAttribute(new ClientUserAttribute().setName("test_user_attribute_2").setValue("test_value_2"))));
+                new HypermediaAttribute(new ClientAttribute().setName("test_user_attribute_1").setValue("test_value_1")),
+                new HypermediaAttribute(new ClientAttribute().setName("test_user_attribute_2").setValue("test_value_2"))));
         orgName = "myOrg1";
         userName = "jasperadmin";
         initClient();
@@ -202,4 +202,5 @@ public class UserAttributesServiceTest extends RestClientTestUtil {
         orgName = null;
         userName = null;
     }
+
 }

@@ -26,7 +26,12 @@ public abstract class RestClientTestUtil {
     }
 
     protected void initSession() {
-        session = client.authenticate(properties.getProperty("username"), properties.getProperty("password"));
+        initSession(properties.getProperty("username"), properties.getProperty("password"));
+    }
+
+    protected void initSession(String username, String password){
+        session = client.authenticate(username, password);
+
     }
 
     private void loadTestProperties(String path) {

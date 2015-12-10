@@ -28,7 +28,7 @@ public class ThumbnailsServiceTest extends RestClientTestUtil {
         initSession();
     }
 
-    @Test
+    @Test(enabled = false)
     public void should_return_list_of_thumbnails_with_default_request_method() {
         // When
         List<ResourceThumbnail> entity = session.thumbnailsService()
@@ -47,7 +47,7 @@ public class ThumbnailsServiceTest extends RestClientTestUtil {
     }
 
 
-    @Test
+    @Test(enabled = false)
     public void should_return_list_of_thumbnails_with_default_request_method_without_default_image() {
         // When
         List<ResourceThumbnail> entity = session.thumbnailsService()
@@ -65,7 +65,7 @@ public class ThumbnailsServiceTest extends RestClientTestUtil {
         assertFalse(entity.get(1).getThumbnailData().isEmpty());
     }
 
-    @Test
+    @Test(enabled = false)
     public void should_return_list_of_thumbnails_with_get_request_method() {
         // When
         List<ResourceThumbnail> entity = session.thumbnailsService()
@@ -83,7 +83,7 @@ public class ThumbnailsServiceTest extends RestClientTestUtil {
         assertFalse(entity.get(1).getThumbnailData().isEmpty());
     }
 
-    @Test
+    @Test(enabled = false)
     public void should_return_list_of_thumbnails_with_get_request_method_without_default_image() {
         // When
         List<ResourceThumbnail> entity = session.thumbnailsService()
@@ -101,7 +101,7 @@ public class ThumbnailsServiceTest extends RestClientTestUtil {
         assertFalse(entity.get(1).getThumbnailData().isEmpty());
     }
 
-    @Test
+    @Test(enabled = false)
     public void should_return_single_thumbnail_as_stream() throws IOException {
         // When
         InputStream entity = session.thumbnailsService()
@@ -114,7 +114,7 @@ public class ThumbnailsServiceTest extends RestClientTestUtil {
         assertNotNull(entity);
     }
 
-    @Test
+    @Test(enabled = false)
     public void should_return_single_thumbnail_as_stream_without_default_image() throws IOException {
         // When
         InputStream entity = session.thumbnailsService()

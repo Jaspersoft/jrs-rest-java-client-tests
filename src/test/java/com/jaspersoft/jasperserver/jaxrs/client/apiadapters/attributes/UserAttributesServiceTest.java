@@ -35,7 +35,7 @@ public class UserAttributesServiceTest extends RestClientTestUtil {
         userAttributes.setProfileAttributes(asList(
                 new HypermediaAttribute(new ClientAttribute().setName("test_user_attribute_1").setValue("test_value_1")),
                 new HypermediaAttribute(new ClientAttribute().setName("test_user_attribute_2").setValue("test_value_2"))));
-        orgName = "myOrg1";
+        orgName = "organization_1";
         userName = "jasperadmin";
         initClient();
         initSession();

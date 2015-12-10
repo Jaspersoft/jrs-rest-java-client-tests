@@ -15,6 +15,14 @@ import static org.testng.Assert.assertNull;
  * @author Tetiana Iefimenko
  */
 public class ServerInfoServiceTest extends RestClientTestUtil {
+    private String EXPECTED_SERVER_FEATURES = "AUD ANA MT EXP Fusion AHD DB ";
+    private String EXPECTED_EDITION = "PRO";
+    private String EXPECTED_SERVER_VERSION = "6.2.1";
+    private String EXPECTED_BUILD = "20151119_0039";
+    private String EXPECTED_LICENSE_TYPE= "Commercial";
+    private String EXPECTED_EDITION_NAME = "Enterprise";
+    private String EXPECTED_DATE_TIME_FORMAT_PATTERN = "yyyy-MM-dd'T'HH:mm:ss";
+    private String EXPECTED_DATE_FORMAT_PATTERN = "yyyy-MM-dd";
 
 
     private AnonymousSession session;
@@ -41,7 +49,7 @@ public class ServerInfoServiceTest extends RestClientTestUtil {
         ServerInfo serverInfo = result.getEntity();
 
         assertNotNull(serverInfo);
-        assertTrue(serverInfo.getEdition().name().equals("PRO"));
+        assertTrue(serverInfo.getEdition().name().equals(EXPECTED_EDITION));
     }
 
     @Test
@@ -54,7 +62,7 @@ public class ServerInfoServiceTest extends RestClientTestUtil {
         String edition = result.getEntity();
 
         assertNotNull(edition);
-        assertTrue(edition.equals("PRO"));
+        assertTrue(edition.equals(EXPECTED_EDITION));
     }
 
 
@@ -68,7 +76,7 @@ public class ServerInfoServiceTest extends RestClientTestUtil {
         String version = result.getEntity();
 
         assertNotNull(version);
-        assertTrue(version.equals("6.1"));
+        assertTrue(version.equals(EXPECTED_SERVER_VERSION));
     }
 
 
@@ -82,7 +90,7 @@ public class ServerInfoServiceTest extends RestClientTestUtil {
         String build = result.getEntity();
 
         assertNotNull(build);
-        assertTrue(build.equals("20150527_1447"));
+        assertTrue(build.equals(EXPECTED_BUILD));
     }
 
     @Test
@@ -95,7 +103,7 @@ public class ServerInfoServiceTest extends RestClientTestUtil {
         String licenseType = result.getEntity();
 
         assertNotNull(licenseType);
-        assertTrue(licenseType.equals("Commercial"));
+        assertTrue(licenseType.equals(EXPECTED_LICENSE_TYPE));
     }
      @Test
     public void should_return_server_features() {
@@ -106,12 +114,12 @@ public class ServerInfoServiceTest extends RestClientTestUtil {
         String features = result.getEntity();
 
         assertNotNull(features);
-        assertTrue(features.equals("Fusion AHD EXP DB ANA AUD MT "));
+        assertTrue(features.equals(EXPECTED_SERVER_FEATURES));
     }
      @Test
     public void should_return_server_expiration() {
          // When
-        OperationResult<String> result =session
+        OperationResult<String> result = session
                 .serverInfoService()
                 .expiration();
         String expiration = result.getEntity();
@@ -128,7 +136,7 @@ public class ServerInfoServiceTest extends RestClientTestUtil {
         String editionName = result.getEntity();
 
         assertNotNull(editionName);
-        assertTrue(editionName.equals("Enterprise"));
+        assertTrue(editionName.equals(EXPECTED_EDITION_NAME));
     }
     @Test
     public void should_return_server_dateTimeFormatPattern() {
@@ -139,7 +147,7 @@ public class ServerInfoServiceTest extends RestClientTestUtil {
         String dateTimeFormatPattern = result.getEntity();
 
         assertNotNull(dateTimeFormatPattern);
-        assertTrue(dateTimeFormatPattern.equals("yyyy-MM-dd'T'HH:mm:ss"));
+        assertTrue(dateTimeFormatPattern.equals(EXPECTED_DATE_TIME_FORMAT_PATTERN));
     }
     @Test
     public void should_return_server_dateFormatPattern() {
@@ -150,7 +158,7 @@ public class ServerInfoServiceTest extends RestClientTestUtil {
         String dateFormatPattern = result.getEntity();
 
         assertNotNull(dateFormatPattern);
-        assertTrue(dateFormatPattern.equals("yyyy-MM-dd"));
+        assertTrue(dateFormatPattern.equals(EXPECTED_DATE_FORMAT_PATTERN));
     }
 
 }

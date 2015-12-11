@@ -17,7 +17,7 @@ import static org.testng.Assert.assertNull;
 public class ServerInfoServiceTest extends RestClientTestUtil {
     private String EXPECTED_SERVER_FEATURES = "AUD ANA MT EXP Fusion AHD DB ";
     private String EXPECTED_EDITION = "PRO";
-    private String EXPECTED_SERVER_VERSION = "6.2.1";
+    private String EXPECTED_SERVER_VERSION = "6.2.0";
     private String EXPECTED_BUILD = "20151119_0039";
     private String EXPECTED_LICENSE_TYPE= "Commercial";
     private String EXPECTED_EDITION_NAME = "Enterprise";

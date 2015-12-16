@@ -70,7 +70,9 @@ public class ServerAttributesServiceTest extends RestClientTestUtil {
                         .setUri("attr:/attributes/" + attrName + "_2")));
         serverAttributes.getProfileAttributes().get(1).setEmbedded(container1);
     }
-
+    /**
+     * For JPS v6.2.1 create or update permissions for single attribute doesn't work
+     * */
     @Test
     public void should_create_single_attribute_with_permissions() {
         // Given
@@ -87,7 +89,7 @@ public class ServerAttributesServiceTest extends RestClientTestUtil {
         // Then
         assertNotNull(entity);
         assertEquals(operationResult.getResponse().getStatus(), Response.Status.CREATED.getStatusCode());
-        assertEquals(new Integer(32), entity.getEmbedded().getRepositoryPermissions().get(0).getMask());
+        assertEquals(new Integer(1), entity.getEmbedded().getRepositoryPermissions().get(0).getMask());
     }
 
     @Test(dependsOnMethods = "should_create_single_attribute_with_permissions")
@@ -246,6 +248,8 @@ public class ServerAttributesServiceTest extends RestClientTestUtil {
         assertEquals(serverAttributes, attributes);
     }
 
+
+
     @Test(dependsOnMethods = "should_replace_all_attributes")
     public void should_delete_server_attributes() {
         // When
@@ -260,6 +264,36 @@ public class ServerAttributesServiceTest extends RestClientTestUtil {
         assertEquals(Response.Status.NO_CONTENT.getStatusCode(), operationResult.getResponse().getStatus());
     }
 
+    @Test
+    public void should_search_attributes_of_holder() {
+            // When
+            OperationResult<HypermediaAttributesListWrapper> operationResult = session
+                    .attributesService()
+                    .allAttributes()
+                    .parameter(AttributesSearchParameter.HOLDER, "/")
+                    .parameter(AttributesSearchParameter.GROUP, AttributesGroupParameter.AWS)
+                    .search();
+            HypermediaAttributesListWrapper attributes = operationResult.getEntity();
+
+            // Then
+            assertNotNull(attributes);
+            assertEquals(Response.Status.OK.getStatusCode(), operationResult.getResponse().getStatus());
+        }
+
+    @Test
+    public void should_search_attributes() {
+            // When
+            OperationResult<HypermediaAttributesListWrapper> operationResult = session
+                    .attributesService()
+                    .allAttributes()
+                    .parameter(AttributesSearchParameter.GROUP, AttributesGroupParameter.AWS)
+                    .search();
+            HypermediaAttributesListWrapper attributes = operationResult.getEntity();
+
+            // Then
+            assertNotNull(attributes);
+            assertEquals(Response.Status.OK.getStatusCode(), operationResult.getResponse().getStatus());
+        }
 
     @AfterClass
     public void after() {

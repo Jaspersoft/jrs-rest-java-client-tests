@@ -2,6 +2,7 @@ package com.jaspersoft.jasperserver.jaxrs.client.apiadapters.resources;
 
 import com.jaspersoft.jasperserver.dto.resources.ClientFolder;
 import com.jaspersoft.jasperserver.dto.resources.ClientResource;
+import com.jaspersoft.jasperserver.dto.resources.ClientResourceListWrapper;
 import com.jaspersoft.jasperserver.jaxrs.client.RestClientTestUtil;
 import com.jaspersoft.jasperserver.jaxrs.client.core.operationresult.OperationResult;
 import java.io.ByteArrayInputStream;
@@ -12,6 +13,7 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertTrue;
 
 /**
  * @author Alexander Krasnyanskiy
@@ -25,6 +27,23 @@ public class ResourcesServiceTest extends RestClientTestUtil {
         initSession();
     }
 
+
+    @Test
+    public void should_return_resources() {
+
+        // When
+
+        OperationResult<ClientResourceListWrapper> result = session
+                .resourcesService()
+                .resources()
+                .search();
+        ClientResourceListWrapper resourceListWrapper = result.getEntity();
+
+        // Then
+
+        assertNotNull(resourceListWrapper);
+        assertTrue(resourceListWrapper.getResourceLookups().size() > 0);
+    }
 
     @Test
     public void should_delete_folder() throws InterruptedException {
@@ -82,4 +101,5 @@ public class ResourcesServiceTest extends RestClientTestUtil {
         session.logout();
         session = null;
     }
+
 }

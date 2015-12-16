@@ -37,7 +37,7 @@ public class OrganizationAttributesServiceTest extends RestClientTestUtil {
         organizationAttribute = new HypermediaAttribute();
         organizationAttribute.setName("test_org_attr");
         organizationAttribute.setValue("test_value");
-        organizationName = "myOrg1";
+        organizationName = "organization_1";
         initClient();
         initSession();
     }
@@ -82,8 +82,10 @@ public class OrganizationAttributesServiceTest extends RestClientTestUtil {
         assertNotNull(entity.getEmbedded());
     }
 
-
-    @Test(dependsOnMethods = "should_return_attribute_with_permissions")
+/**
+ * For JPS v6.2.1 update permissions for single attribute doesn't work
+ * */
+    @Test(dependsOnMethods = "should_return_attribute_with_permissions", enabled = false)
     public void should_update_attribute_with_permissions() {
         organizationAttribute.setDescription("Organization attribute description");
         organizationAttribute.setPermissionMask(32);
@@ -110,7 +112,7 @@ public class OrganizationAttributesServiceTest extends RestClientTestUtil {
         assertEquals(new Integer(32), entity.getEmbedded().getRepositoryPermissions().get(0).getMask());
     }
 
-    @Test(dependsOnMethods = "should_update_attribute_with_permissions")
+    @Test(dependsOnMethods = "should_return_attribute_with_permissions")
     public void should_delete_attribute() {
         OperationResult<HypermediaAttribute> operationResult = session
                 .attributesService()
@@ -196,6 +198,38 @@ public class OrganizationAttributesServiceTest extends RestClientTestUtil {
     }
 
     @Test(dependsOnMethods = "should_return_specified_server_attributes_with_permissions")
+    public void should_search_attributes() {
+        // When
+        OperationResult<HypermediaAttributesListWrapper> operationResult = session
+                .attributesService()
+                .forOrganization(organizationName)
+                .allAttributes()
+                .parameter(AttributesSearchParameter.GROUP, AttributesGroupParameter.CUSTOM)
+                .search();
+        HypermediaAttributesListWrapper attributes = operationResult.getEntity();
+
+        // Then
+        assertNotNull(attributes);
+        assertEquals(Response.Status.OK.getStatusCode(), operationResult.getResponse().getStatus());
+    }
+
+    @Test(dependsOnMethods = "should_search_attributes")
+    public void should_search_attributes_of_holder() {
+        // When
+        OperationResult<HypermediaAttributesListWrapper> operationResult = session
+                .attributesService()
+                .allAttributes()
+                .parameter(AttributesSearchParameter.HOLDER, organizationName)
+                .parameter(AttributesSearchParameter.GROUP, AttributesGroupParameter.CUSTOM)
+                .search();
+        HypermediaAttributesListWrapper attributes = operationResult.getEntity();
+
+        // Then
+        assertNotNull(attributes);
+        assertEquals(Response.Status.OK.getStatusCode(), operationResult.getResponse().getStatus());
+    }
+
+    @Test(dependsOnMethods = "should_search_attributes_of_holder")
     public void should_delete_specified_server_attributes() {
         OperationResult<HypermediaAttributesListWrapper> operationResult = session
                 .attributesService()
@@ -207,7 +241,6 @@ public class OrganizationAttributesServiceTest extends RestClientTestUtil {
         assertTrue(instanceOf(NullEntityOperationResult.class).matches(operationResult));
         assertEquals(Response.Status.NO_CONTENT.getStatusCode(), operationResult.getResponse().getStatus());
     }
-
 
     @AfterClass
     public void after() {

@@ -21,6 +21,8 @@ import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertTrue;
 
 public class ThumbnailsServiceTest extends RestClientTestUtil {
+    private String reportUri1 = "/public/Samples/Reports/08g.UnitSalesDetailReport";
+    private String reportUri2 = "/public/Samples/Reports/11g.SalesByMonthReport";
 
     @BeforeClass
     public void before() {
@@ -33,8 +35,7 @@ public class ThumbnailsServiceTest extends RestClientTestUtil {
         // When
         List<ResourceThumbnail> entity = session.thumbnailsService()
                 .thumbnails()
-                .reports("/public/Samples/Reports/08g.UnitSalesDetailReport",
-                        "/public/Samples/Reports/11g.SalesByMonthReport")
+                .reports(reportUri1, reportUri2)
                 .defaultAllowed(true)
                 .get()
                 .getEntity()
@@ -52,8 +53,8 @@ public class ThumbnailsServiceTest extends RestClientTestUtil {
         // When
         List<ResourceThumbnail> entity = session.thumbnailsService()
                 .thumbnails()
-                .reports("/public/Samples/Reports/08g.UnitSalesDetailReport",
-                        "/public/Samples/Reports/11g.SalesByMonthReport")
+                .reports(reportUri1,
+                        reportUri2)
                 .defaultAllowed(false)
                 .get()
                 .getEntity()
@@ -70,8 +71,8 @@ public class ThumbnailsServiceTest extends RestClientTestUtil {
         // When
         List<ResourceThumbnail> entity = session.thumbnailsService()
                 .thumbnails()
-                .reports(asList("/public/Samples/Reports/08g.UnitSalesDetailReport",
-                        "/public/Samples/Reports/11g.SalesByMonthReport"))
+                .reports(asList(reportUri1,
+                        reportUri2))
                 .defaultAllowed(true).requestMethod(RequestMethod.GET)
                 .get()
                 .getEntity()
@@ -88,8 +89,8 @@ public class ThumbnailsServiceTest extends RestClientTestUtil {
         // When
         List<ResourceThumbnail> entity = session.thumbnailsService()
                 .thumbnails()
-                .reports(asList("/public/Samples/Reports/08g.UnitSalesDetailReport",
-                        "/public/Samples/Reports/11g.SalesByMonthReport"))
+                .reports(asList(reportUri1,
+                        reportUri2))
                 .defaultAllowed(false).requestMethod(RequestMethod.GET)
                 .get()
                 .getEntity()
@@ -106,7 +107,7 @@ public class ThumbnailsServiceTest extends RestClientTestUtil {
         // When
         InputStream entity = session.thumbnailsService()
                 .thumbnail()
-                .report("/public/Samples/Reports/08g.UnitSalesDetailReport")
+                .report(reportUri1)
                 .defaultAllowed(true)
                 .get()
                 .getEntity();
@@ -119,7 +120,7 @@ public class ThumbnailsServiceTest extends RestClientTestUtil {
         // When
         InputStream entity = session.thumbnailsService()
                 .thumbnail()
-                .report("/public/Samples/Reports/11g.SalesByMonthReport")
+                .report(reportUri2)
                 .defaultAllowed(false)
                 .get()
                 .getEntity();

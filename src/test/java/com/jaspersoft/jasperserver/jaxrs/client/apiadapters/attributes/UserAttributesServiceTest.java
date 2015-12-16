@@ -19,7 +19,7 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertTrue;
 
-@Test(sequential = true)
+@Test
 public class UserAttributesServiceTest extends RestClientTestUtil {
     private HypermediaAttribute userAttribute;
     private HypermediaAttributesListWrapper userAttributes;
@@ -178,7 +178,25 @@ public class UserAttributesServiceTest extends RestClientTestUtil {
         assertTrue(attributes.get(0).getEmbedded() != null);
     }
 
+
     @Test(dependsOnMethods = "should_return_specified_server_attributes_with_permissions")
+    public void should_search_attributes() {
+        // When
+        OperationResult<HypermediaAttributesListWrapper> operationResult = session
+                .attributesService()
+                .allAttributes()
+                .parameter(AttributesSearchParameter.HOLDER, orgName + "/" + userName)
+                .parameter(AttributesSearchParameter.GROUP, AttributesGroupParameter.CUSTOM)
+                .parameter(AttributesSearchParameter.INCLUDE_INHERITED, Boolean.TRUE)
+                .search();
+        HypermediaAttributesListWrapper attributes = operationResult.getEntity();
+
+        // Then
+        assertNotNull(attributes);
+        assertEquals(Response.Status.OK.getStatusCode(), operationResult.getResponse().getStatus());
+    }
+
+    @Test(dependsOnMethods = "should_search_attributes")
     public void should_delete_specified_server_attributes() {
         OperationResult<HypermediaAttributesListWrapper> entity = session
                 .attributesService()

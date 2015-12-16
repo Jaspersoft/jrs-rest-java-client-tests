@@ -198,6 +198,38 @@ public class OrganizationAttributesServiceTest extends RestClientTestUtil {
     }
 
     @Test(dependsOnMethods = "should_return_specified_server_attributes_with_permissions")
+    public void should_search_attributes() {
+        // When
+        OperationResult<HypermediaAttributesListWrapper> operationResult = session
+                .attributesService()
+                .forOrganization(organizationName)
+                .allAttributes()
+                .parameter(AttributesSearchParameter.GROUP, AttributesGroupParameter.CUSTOM)
+                .search();
+        HypermediaAttributesListWrapper attributes = operationResult.getEntity();
+
+        // Then
+        assertNotNull(attributes);
+        assertEquals(Response.Status.OK.getStatusCode(), operationResult.getResponse().getStatus());
+    }
+
+    @Test(dependsOnMethods = "should_search_attributes")
+    public void should_search_attributes_of_holder() {
+        // When
+        OperationResult<HypermediaAttributesListWrapper> operationResult = session
+                .attributesService()
+                .allAttributes()
+                .parameter(AttributesSearchParameter.HOLDER, organizationName)
+                .parameter(AttributesSearchParameter.GROUP, AttributesGroupParameter.CUSTOM)
+                .search();
+        HypermediaAttributesListWrapper attributes = operationResult.getEntity();
+
+        // Then
+        assertNotNull(attributes);
+        assertEquals(Response.Status.OK.getStatusCode(), operationResult.getResponse().getStatus());
+    }
+
+    @Test(dependsOnMethods = "should_search_attributes_of_holder")
     public void should_delete_specified_server_attributes() {
         OperationResult<HypermediaAttributesListWrapper> operationResult = session
                 .attributesService()
@@ -209,7 +241,6 @@ public class OrganizationAttributesServiceTest extends RestClientTestUtil {
         assertTrue(instanceOf(NullEntityOperationResult.class).matches(operationResult));
         assertEquals(Response.Status.NO_CONTENT.getStatusCode(), operationResult.getResponse().getStatus());
     }
-
 
     @AfterClass
     public void after() {

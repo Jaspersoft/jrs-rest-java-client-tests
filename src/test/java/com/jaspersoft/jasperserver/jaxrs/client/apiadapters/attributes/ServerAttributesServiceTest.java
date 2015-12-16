@@ -248,6 +248,8 @@ public class ServerAttributesServiceTest extends RestClientTestUtil {
         assertEquals(serverAttributes, attributes);
     }
 
+
+
     @Test(dependsOnMethods = "should_replace_all_attributes")
     public void should_delete_server_attributes() {
         // When
@@ -262,6 +264,36 @@ public class ServerAttributesServiceTest extends RestClientTestUtil {
         assertEquals(Response.Status.NO_CONTENT.getStatusCode(), operationResult.getResponse().getStatus());
     }
 
+    @Test
+    public void should_search_attributes_of_holder() {
+            // When
+            OperationResult<HypermediaAttributesListWrapper> operationResult = session
+                    .attributesService()
+                    .allAttributes()
+                    .parameter(AttributesSearchParameter.HOLDER, "/")
+                    .parameter(AttributesSearchParameter.GROUP, AttributesGroupParameter.AWS)
+                    .search();
+            HypermediaAttributesListWrapper attributes = operationResult.getEntity();
+
+            // Then
+            assertNotNull(attributes);
+            assertEquals(Response.Status.OK.getStatusCode(), operationResult.getResponse().getStatus());
+        }
+
+    @Test
+    public void should_search_attributes() {
+            // When
+            OperationResult<HypermediaAttributesListWrapper> operationResult = session
+                    .attributesService()
+                    .allAttributes()
+                    .parameter(AttributesSearchParameter.GROUP, AttributesGroupParameter.AWS)
+                    .search();
+            HypermediaAttributesListWrapper attributes = operationResult.getEntity();
+
+            // Then
+            assertNotNull(attributes);
+            assertEquals(Response.Status.OK.getStatusCode(), operationResult.getResponse().getStatus());
+        }
 
     @AfterClass
     public void after() {

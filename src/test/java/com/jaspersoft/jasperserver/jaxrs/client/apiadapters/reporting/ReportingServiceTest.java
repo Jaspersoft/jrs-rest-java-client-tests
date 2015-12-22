@@ -10,6 +10,7 @@ import com.jaspersoft.jasperserver.jaxrs.client.dto.reports.ReportExecutionReque
 import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.TimeZone;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -25,6 +26,8 @@ import static org.testng.AssertJUnit.assertNotNull;
 public class ReportingServiceTest extends RestClientTestUtil {
 
 
+    private final String reportUnitUri = "/organizations/organization_1/adhoc/topics/Cascading_multi_select_topic";
+
     @BeforeClass
     public void before() {
         initClient();
@@ -37,7 +40,7 @@ public class ReportingServiceTest extends RestClientTestUtil {
         // When
         OperationResult<InputStream> result = session
                 .reportingService()
-                .report("/organizations/organization_1/adhoc/topics/Cascading_multi_select_topic")
+                .report(reportUnitUri)
                 .prepareForRun(ReportOutputFormat.PDF, 1)
                 .parameter("Cascading_state_multi_select", "CA")
                 .parameter("Cascading_state_multi_select", "OR", "WA")
@@ -51,12 +54,28 @@ public class ReportingServiceTest extends RestClientTestUtil {
     }
 
     @Test
+    public void should_return_proper_entity_for_LA_timezone() {
+
+        // When
+        OperationResult<InputStream> result = session
+                .reportingService()
+                .report("/public/Samples/Reports/12g.PromotionDetailsReport")
+                .prepareForRun(ReportOutputFormat.PDF, 1)
+                .forTimeZone(TimeZone.getTimeZone("America/Los_Angeles"))
+                .run();
+
+        InputStream entity = result.getEntity();
+        // Then
+        assertNotNull(entity);
+    }
+
+    @Test
     public void should_return_proper_entity_for_csv_report_output_format() {
 
         // When
         OperationResult<InputStream> result = session
                 .reportingService()
-                .report("/organizations/organization_1/adhoc/topics/Cascading_multi_select_topic")
+                .report(reportUnitUri)
                 .prepareForRun("csv", 1)
                 .parameter("Cascading_state_multi_select", "CA")
                 .parameter("Cascading_state_multi_select", "OR", "WA")
@@ -77,7 +96,7 @@ public class ReportingServiceTest extends RestClientTestUtil {
         OperationResult<InputStream> result = client
                 .authenticate("superuser", "superuser")
                 .reportingService()
-                .report("/organizations/organization_1/adhoc/topics/Cascading_multi_select_topic")
+                .report(reportUnitUri)
                 .prepareForRun(ReportOutputFormat.PDF, 1)
                 .parameter("Cascading_state_multi_select", "CA")
                 .parameter("Cascading_state_multi_select", "OR", "WA")
@@ -93,7 +112,7 @@ public class ReportingServiceTest extends RestClientTestUtil {
         // When
         OperationResult<InputStream> result = session
                 .reportingService()
-                .report("/organizations/organization_1/adhoc/topics/Cascading_multi_select_topic")
+                .report(reportUnitUri)
                 .prepareForRun(ReportOutputFormat.PDF, 0)
                 .parameter("Cascading_state_multi_select", "CA")
                 .parameter("Cascading_state_multi_select", "OR", "WA")
@@ -112,7 +131,7 @@ public class ReportingServiceTest extends RestClientTestUtil {
         // When
         OperationResult<InputStream> result = session
                 .reportingService()
-                .report("/organizations/organization_1/adhoc/topics/Cascading_multi_select_topic")
+                .report(reportUnitUri)
                 .prepareForRun("PDF", 1)
                 .parameter("Cascading_state_multi_select", "CA")
                 .parameter("Cascading_name_single_select", "Adams-Steen Transportation Holdings")
@@ -131,7 +150,7 @@ public class ReportingServiceTest extends RestClientTestUtil {
         // When
         OperationResult<InputStream> result = session
                 .reportingService()
-                .report("/organizations/organization_1/adhoc/topics/Cascading_multi_select_topic")
+                .report(reportUnitUri)
                 .prepareForRun("PDF", 0, -1, 1)
                 .parameter("Cascading_state_multi_select", "CA")
                 .parameter("Cascading_name_single_select", "Adams-Steen Transportation Holdings")
@@ -150,7 +169,7 @@ public class ReportingServiceTest extends RestClientTestUtil {
         // When
         OperationResult<InputStream> result = session
                 .reportingService()
-                .report("/organizations/organization_1/adhoc/topics/Cascading_multi_select_topic")
+                .report(reportUnitUri)
                 .prepareForRun("PDF", 0, -1)
                 .parameter("Cascading_state_multi_select", "CA")
                 .parameter("Cascading_name_single_select", "Adams-Steen Transportation Holdings")
@@ -169,7 +188,7 @@ public class ReportingServiceTest extends RestClientTestUtil {
         // When
         OperationResult<InputStream> result = session
                 .reportingService()
-                .report("/organizations/organization_1/adhoc/topics/Cascading_multi_select_topic")
+                .report(reportUnitUri)
                 .prepareForRun(ReportOutputFormat.PDF)
                 .parameter("Cascading_state_multi_select", "CA")
                 .parameter("Cascading_name_single_select", "Adams-Steen Transportation Holdings")
@@ -187,7 +206,7 @@ public class ReportingServiceTest extends RestClientTestUtil {
         // When
         OperationResult<InputStream> result = session
                 .reportingService()
-                .report("/organizations/organization_1/adhoc/topics/Cascading_multi_select_topic")
+                .report(reportUnitUri)
                 .prepareForRun(ReportOutputFormat.CSV)
                 .parameter("Cascading_state_multi_select", "CA")
                 .parameter("Cascading_name_single_select", "Adams-Steen Transportation Holdings")
@@ -206,7 +225,7 @@ public class ReportingServiceTest extends RestClientTestUtil {
         // When
         OperationResult<InputStream> result = session
                 .reportingService()
-                .report("/organizations/organization_1/adhoc/topics/Cascading_multi_select_topic")
+                .report(reportUnitUri)
                 .prepareForRun(ReportOutputFormat.PDF)
                 .parameter("Cascading_state_multi_select", "CA")
                 .parameter("Cascading_name_single_select", "Adams-Steen Transportation Holdings")
@@ -224,7 +243,7 @@ public class ReportingServiceTest extends RestClientTestUtil {
 
         // When
         ReportExecutionRequest request = new ReportExecutionRequest();
-        request.setReportUnitUri("/organizations/organization_1/adhoc/topics/Cascading_multi_select_topic");
+        request.setReportUnitUri(reportUnitUri);
         request
                 .setAsync(true)
                 .setOutputFormat(ReportOutputFormat.HTML);
@@ -243,7 +262,7 @@ public class ReportingServiceTest extends RestClientTestUtil {
 
         // When
         ReportExecutionRequest request = new ReportExecutionRequest();
-        request.setReportUnitUri("/organizations/organization_1/adhoc/topics/Cascading_multi_select_topic");
+        request.setReportUnitUri(reportUnitUri);
         request
                 .setAsync(true)
                 .setOutputFormat("html");
@@ -271,7 +290,47 @@ public class ReportingServiceTest extends RestClientTestUtil {
                 .setOutputFormat(ReportOutputFormat.XLS)
                 .setParameters(reportParameters)
                 .setPages("1")
-                .setReportUnitUri("/organizations/organization_1/adhoc/topics/Cascading_multi_select_topic")
+                .setReportUnitUri(reportUnitUri)
+                .setAsync(true);
+
+        // When
+        OperationResult<ReportExecutionDescriptor> operationResult = reportingService.newReportExecutionRequest(request);
+
+        ReportExecutionDescriptor reportExecutionDescriptor = operationResult.getEntity();
+
+        OperationResult<ReportExecutionDescriptor> executionDetails = reportingService.reportExecutionRequest(reportExecutionDescriptor.getRequestId()).executionDetails();
+
+        ReportExecutionDescriptor descriptor = executionDetails.getEntity();
+        while (!descriptor.getStatus().equals("ready"))
+        {
+            executionDetails = reportingService.reportExecutionRequest(reportExecutionDescriptor.getRequestId()).executionDetails();
+            descriptor = executionDetails.getEntity();
+        }
+
+        final ReportExecutionRequestBuilder reportExecutionRequest = reportingService.reportExecutionRequest(descriptor.getRequestId());
+        final List<ExportDescriptor> exports = descriptor.getExports();
+        OperationResult<InputStream> reportOutput = null;
+        if (exports != null && exports.size() > 0)
+        {
+            final String exportId = exports.get(0).getId();
+            final ExportExecutionRequestBuilder export = reportExecutionRequest.export(exportId);
+            reportOutput = export.outputResource();
+        }
+        // Then
+        assertNotNull(reportOutput);
+    }
+
+    @Test
+    public void should_export_report_to_pdf_in_LA_timezone_in_async_mode() {
+        // Given
+        ReportingService reportingService = session.reportingService();
+
+        ReportExecutionRequest request = new ReportExecutionRequest();
+        request
+                .setOutputFormat(ReportOutputFormat.PDF)
+                .setPages("1")
+                .setTimeZone(TimeZone.getTimeZone("America/Los_Angeles"))
+                .setReportUnitUri("/public/Samples/Reports/12g.PromotionDetailsReport")
                 .setAsync(true);
 
         // When
@@ -316,7 +375,7 @@ public class ReportingServiceTest extends RestClientTestUtil {
                 .setOutputFormat(ReportOutputFormat.CSV)
                 .setParameters(reportParameters)
                 .setPages("1")
-                .setReportUnitUri("/organizations/organization_1/adhoc/topics/Cascading_multi_select_topic")
+                .setReportUnitUri(reportUnitUri)
                 .setAsync(true);
 
         // When
@@ -356,7 +415,7 @@ public class ReportingServiceTest extends RestClientTestUtil {
                 .setOutputFormat("csv")
                 .setParameters(reportParameters)
                 .setPages("1")
-                .setReportUnitUri("/organizations/organization_1/adhoc/topics/Cascading_multi_select_topic")
+                .setReportUnitUri(reportUnitUri)
                 .setAsync(true);
 
         // When

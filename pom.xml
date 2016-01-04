@@ -6,7 +6,7 @@
 
     <groupId>com.jaspersoft</groupId>
     <artifactId>jrs-rest-java-client-tests</artifactId>
-    <version>6.1.4</version>
+    <version>6.2.1</version>
     <name>Integration tests for JasperReports server REST client</name>
 
     <properties>

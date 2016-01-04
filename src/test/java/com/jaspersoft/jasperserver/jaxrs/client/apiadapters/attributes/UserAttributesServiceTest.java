@@ -1,7 +1,7 @@
 package com.jaspersoft.jasperserver.jaxrs.client.apiadapters.attributes;
 
+import com.jaspersoft.jasperserver.dto.authority.ClientAttribute;
 import com.jaspersoft.jasperserver.dto.authority.ClientUser;
-import com.jaspersoft.jasperserver.dto.authority.ClientUserAttribute;
 import com.jaspersoft.jasperserver.dto.authority.hypermedia.HypermediaAttribute;
 import com.jaspersoft.jasperserver.dto.authority.hypermedia.HypermediaAttributesListWrapper;
 import com.jaspersoft.jasperserver.jaxrs.client.RestClientTestUtil;
@@ -15,12 +15,12 @@ import org.testng.annotations.Test;
 
 import static java.util.Arrays.asList;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
-import static org.testng.AssertJUnit.assertEquals;
-import static org.testng.AssertJUnit.assertNotNull;
-import static org.testng.AssertJUnit.assertTrue;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertTrue;
 
-@Test(sequential = true)
-public class UserAttributesServiceIT extends RestClientTestUtil {
+@Test
+public class UserAttributesServiceTest extends RestClientTestUtil {
     private HypermediaAttribute userAttribute;
     private HypermediaAttributesListWrapper userAttributes;
     private String orgName;
@@ -33,9 +33,9 @@ public class UserAttributesServiceIT extends RestClientTestUtil {
         userAttribute.setValue("test_value");
         userAttributes = new HypermediaAttributesListWrapper();
         userAttributes.setProfileAttributes(asList(
-                new HypermediaAttribute(new ClientUserAttribute().setName("test_user_attribute_1").setValue("test_value_1")),
-                new HypermediaAttribute(new ClientUserAttribute().setName("test_user_attribute_2").setValue("test_value_2"))));
-        orgName = "myOrg1";
+                new HypermediaAttribute(new ClientAttribute().setName("test_user_attribute_1").setValue("test_value_1")),
+                new HypermediaAttribute(new ClientAttribute().setName("test_user_attribute_2").setValue("test_value_2"))));
+        orgName = "organization_1";
         userName = "jasperadmin";
         initClient();
         initSession();
@@ -178,7 +178,25 @@ public class UserAttributesServiceIT extends RestClientTestUtil {
         assertTrue(attributes.get(0).getEmbedded() != null);
     }
 
+
     @Test(dependsOnMethods = "should_return_specified_server_attributes_with_permissions")
+    public void should_search_attributes() {
+        // When
+        OperationResult<HypermediaAttributesListWrapper> operationResult = session
+                .attributesService()
+                .allAttributes()
+                .parameter(AttributesSearchParameter.HOLDER, orgName + "/" + userName)
+                .parameter(AttributesSearchParameter.GROUP, AttributesGroupParameter.CUSTOM)
+                .parameter(AttributesSearchParameter.INCLUDE_INHERITED, Boolean.TRUE)
+                .search();
+        HypermediaAttributesListWrapper attributes = operationResult.getEntity();
+
+        // Then
+        assertNotNull(attributes);
+        assertEquals(Response.Status.OK.getStatusCode(), operationResult.getResponse().getStatus());
+    }
+
+    @Test(dependsOnMethods = "should_search_attributes")
     public void should_delete_specified_server_attributes() {
         OperationResult<HypermediaAttributesListWrapper> entity = session
                 .attributesService()
@@ -202,4 +220,5 @@ public class UserAttributesServiceIT extends RestClientTestUtil {
         orgName = null;
         userName = null;
     }
+
 }

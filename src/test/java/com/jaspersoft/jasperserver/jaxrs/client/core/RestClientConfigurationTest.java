@@ -14,7 +14,7 @@ import static junit.framework.Assert.assertTrue;
 /**
  * @author Tetiana Iefimenko
  */
-public class RestClientConfigurationIT extends RestClientTestUtil {
+public class RestClientConfigurationTest extends RestClientTestUtil {
 
 
     @Test

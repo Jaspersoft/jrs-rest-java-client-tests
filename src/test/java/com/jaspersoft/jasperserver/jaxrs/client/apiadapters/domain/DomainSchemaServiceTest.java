@@ -25,8 +25,21 @@ public class DomainSchemaServiceTest extends RestClientTestUtil{
     public void should_return_domain_schema() {
         session.getStorage().getConfiguration().setAcceptMimeType(MimeType.XML);
         Schema schema = session.domainSchemaService()
-                .domainSchema("/public/Simple_Domain_schema.xml")
+                .domainSchema("/public/Simple_Domain_schema")
                 .retrieve()
+                .getEntity();
+        assertNotNull(schema);
+        assertTrue(schema.getPresentation().size() > 0);
+        assertTrue(schema.getResources().size() > 0);
+    }
+
+
+    @Test
+    public void should_return_domain_schema_as_resiurce() {
+//        session.getStorage().getConfiguration().setAcceptMimeType(MimeType.XML);
+        Schema schema = session.domainSchemaService()
+                .domainSchema("/public/Simple_Domain_schema")
+                .getSchemaAsResource()
                 .getEntity();
         assertNotNull(schema);
         assertTrue(schema.getPresentation().size() > 0);

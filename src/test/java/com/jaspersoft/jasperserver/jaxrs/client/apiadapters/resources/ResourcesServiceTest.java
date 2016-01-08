@@ -104,14 +104,12 @@ public class ResourcesServiceTest extends RestClientTestUtil {
         // When
         ClientResource clientResource = session.resourcesService()
                 .resource("/public")
-                .copyFrom("/Domains/Simple_Domain_files/Simple_Domain_schema")
+                .copyFrom("/public/Simple_Domain_files/Simple_Domain_schema")
                 .getEntity();
 
         Assert.assertNotNull(clientResource);
         Assert.assertNotNull(clientResource.getCreationDate());
     }
-
-
 
     @Test
     public void should_return_resource() throws InterruptedException {
@@ -123,6 +121,51 @@ public class ResourcesServiceTest extends RestClientTestUtil {
         assertNotNull(clientFolderOperationResult.getEntity());
         assertNotNull(clientFolderOperationResult.getEntity().getVersion());
     }
+////TODO
+//    @Test
+//    public void should_create_resource() throws InterruptedException {
+//
+//        ClientFolder folder = new ClientFolder();
+//        folder
+//                .setUri("/organizations/organization_1/AdditionalResourcesForTesting/Domains")
+//                .setLabel("Test Domain")
+//                .setDescription("Test domain description")
+//                .setPermissionMask(0)
+//                .setCreationDate("2014-01-24 16:27:47")
+//                .setUpdateDate("2014-01-24 16:27:47")
+//                .setVersion(0);
+//
+//        OperationResult<ClientResource> result = session
+//                .resourcesService()
+//                .resource(folder.getUri())
+//                .createNew(folder);
+//
+//    }
+//
+//    //TODO
+//    @Test
+//    public void should_create_or_update_resource() throws InterruptedException {
+//
+//        ClientFolder folder = new ClientFolder();
+//        folder
+//                .setUri("/reports/testFolder")
+//                .setLabel("Test Folder")
+//                .setDescription("Test folder description")
+//                .setPermissionMask(0)
+//                .setCreationDate("2014-01-24 16:27:47")
+//                .setUpdateDate("2014-01-24 16:27:47")
+//                .setVersion(0);
+//
+//        OperationResult<ClientResource> result = client
+//                .authenticate("jasperadmin", "jasperadmin")
+//                .resourcesService()
+//                .resource(folder.getUri())
+//                .createOrUpdate(folder);
+//
+//
+//    }
+
+
 
     @AfterClass
     public void after() {

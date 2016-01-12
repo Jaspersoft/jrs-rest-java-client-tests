@@ -45,6 +45,29 @@ public class ResourcesServiceTest extends RestClientTestUtil {
         assertTrue(resourceListWrapper.getResourceLookups().size() > 0);
     }
 
+
+    @Test
+    public void should_return_resources_with_parameters() {
+
+        // When
+
+        OperationResult<ClientResourceListWrapper> result = session
+                .resourcesService()
+                .resources()
+                .parameter(ResourceSearchParameter.FOLDER_URI, "/public/Samples")
+                .parameter(ResourceSearchParameter.LIMIT, "5")
+                .search();
+        ClientResourceListWrapper resourceListWrapper = result.getEntity();
+
+        // Then
+
+        assertNotNull(resourceListWrapper);
+        assertTrue(resourceListWrapper.getResourceLookups().size() > 0);
+        assertTrue(resourceListWrapper.getResourceLookups().size() <= 5 );
+    }
+
+
+
     @Test
     public void should_delete_folder() throws InterruptedException {
 
@@ -75,6 +98,20 @@ public class ResourcesServiceTest extends RestClientTestUtil {
     }
 
 
+    @Test
+    public void should_copy_resource() throws InterruptedException {
+
+        // When
+        ClientResource clientResource = session.resourcesService()
+                .resource("/public")
+                .copyFrom("/Domains/Simple_Domain_files/Simple_Domain_schema")
+                .getEntity();
+
+        Assert.assertNotNull(clientResource);
+        Assert.assertNotNull(clientResource.getCreationDate());
+    }
+
+
 
     @Test
     public void should_return_resource() throws InterruptedException {
@@ -85,15 +122,6 @@ public class ResourcesServiceTest extends RestClientTestUtil {
         Assert.assertTrue(clientFolderOperationResult.getResponse().getStatus() == 200);
         assertNotNull(clientFolderOperationResult.getEntity());
         assertNotNull(clientFolderOperationResult.getEntity().getVersion());
-
-        OperationResult<ClientResource> clientResource = session.resourcesService()
-                .resource("/").get(ClientResource.class);
-        Assert.assertTrue(clientResource.getResponse().getStatus() == 200);
-        assertNotNull(clientResource.getEntity());
-        assertNotNull(clientResource.getEntity().getVersion());
-
-
-
     }
 
     @AfterClass

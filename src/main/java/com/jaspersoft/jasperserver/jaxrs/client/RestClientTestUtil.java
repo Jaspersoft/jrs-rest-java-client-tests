@@ -7,7 +7,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Locale;
 import java.util.Properties;
+import java.util.TimeZone;
 
 /**
  * @author Tetiana Iefimenko
@@ -31,6 +33,11 @@ public abstract class RestClientTestUtil {
 
     protected void initSession(String username, String password){
         session = client.authenticate(username, password);
+
+    }
+
+    protected void initSession(String username, String password, Locale locale, TimeZone timeZone){
+        session = client.authenticate(username, password, locale, timeZone);
 
     }
 

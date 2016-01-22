@@ -2,9 +2,10 @@ package com.jaspersoft.jasperserver.jaxrs.client.apiadapters.domain;
 
 import com.jaspersoft.jasperserver.dto.resources.ClientFile;
 import com.jaspersoft.jasperserver.dto.resources.domain.ClientSchema;
-import com.jaspersoft.jasperserver.dto.resources.domain.ResourceElement;
+import com.jaspersoft.jasperserver.dto.resources.domain.PresentationGroupElement;
 import com.jaspersoft.jasperserver.dto.resources.domain.ResourceGroupElement;
 import com.jaspersoft.jasperserver.dto.resources.domain.Schema;
+import com.jaspersoft.jasperserver.dto.resources.domain.SchemaElement;
 import com.jaspersoft.jasperserver.jaxrs.client.RestClientTestUtil;
 import com.jaspersoft.jasperserver.jaxrs.client.core.enums.MimeType;
 import java.util.Collections;
@@ -21,6 +22,9 @@ import static org.testng.Assert.assertNotNull;
  * @author Tetiana Iefimenko
  */
 public class DomainSchemaServiceTest extends RestClientTestUtil {
+
+    private final String SCHEMA_URI = "/public/schema.xml";
+    private final String SIMPLE_SCHEMA_URI = "/public/Simple_Domain_schema";
 
     @BeforeClass
     public void before() {
@@ -46,7 +50,7 @@ public class DomainSchemaServiceTest extends RestClientTestUtil {
         session.getStorage().getConfiguration().setAcceptMimeType(MimeType.JSON);
         ClientSchema schema = session
                 .domainService()
-                .forDomain("/public/schema.xml")
+                .forDomain(SIMPLE_SCHEMA_URI)
                 .schema()
                 .get()
                 .getEntity();
@@ -59,21 +63,21 @@ public class DomainSchemaServiceTest extends RestClientTestUtil {
         session.getStorage().getConfiguration().setAcceptMimeType(MimeType.JSON);
         ClientSchema schema = session
                 .domainService()
-                .forDomain("/public/schema.xml")
+                .forDomain(SIMPLE_SCHEMA_URI)
                 .schema()
                 .get()
                 .getEntity();
 
         ClientSchema schemaAfterPut = session
                 .domainService()
-                .forDomain("/public/schema.xml")
+                .forDomain(SIMPLE_SCHEMA_URI)
                 .schema()
                 .update(schema)
                 .getEntity();
 
         ClientSchema resultSchema = session
                 .domainService()
-                .forDomain("/public/schema.xml")
+                .forDomain(SIMPLE_SCHEMA_URI)
                 .schema()
                 .get()
                 .getEntity();
@@ -119,50 +123,55 @@ public class DomainSchemaServiceTest extends RestClientTestUtil {
             return false;
         }
 
-        if (!schema1.getPresentation().containsAll(schema2.getPresentation())) {
+        if (!equalGroupElements(schema1.getPresentation(), schema2.getPresentation())) {
             return false;
         }
 
-        if (!schema1.getResources().containsAll(schema2.getResources())) {
-            return false;
-        }
-
-        if (!isEqual(schema1.getResources(), schema2.getResources())) {
+        if (!equalGroupElements(schema1.getResources(), schema2.getResources())) {
             return false;
         }
 
         return true;
     }
 
-    private boolean isEqual(List<? extends ResourceElement> groupElements1, List<? extends  ResourceElement> groupElements2) {
+    private boolean equalGroupElements(List<? extends SchemaElement> groupElements1, List<? extends SchemaElement> groupElements2) {
         if (groupElements1.size() != groupElements2.size()) {
             return false;
         }
 
-        if (!(groupElements1.get(0) instanceof ResourceGroupElement)){
+        if ((!(groupElements1.get(0) instanceof ResourceGroupElement ) & (!(groupElements1.get(0) instanceof PresentationGroupElement)))) {
             return groupElements1.containsAll(groupElements2);
-    }
+        }
 
-        Comparator<ResourceElement> comparator = new Comparator<ResourceElement>() {
-            public int compare(ResourceElement elem1, ResourceElement elem2) {
+        Comparator<SchemaElement> comparator = new Comparator<SchemaElement>() {
+            public int compare(SchemaElement elem1, SchemaElement elem2) {
                 return elem1.getName().compareTo(elem2.getName());
             }
         };
         Collections.sort(groupElements1, comparator);
         Collections.sort(groupElements2, comparator);
-        List<? extends ResourceGroupElement> castedGroupElements1 = (List<? extends ResourceGroupElement>) groupElements1;
-        List<? extends ResourceGroupElement> castedGroupElements2 = (List<? extends ResourceGroupElement>) groupElements2;
         boolean result = true;
-        for (int i = 0; i < groupElements1.size(); i++) {
-
-             if (!isEqual(castedGroupElements1.get(i).getElements(), castedGroupElements2.get(i).getElements())) {
-                 result = false;
-             }
-
+        if (groupElements1.get(0) instanceof  ResourceGroupElement) {
+            List<? extends ResourceGroupElement> castedGroupElements1 = (List<? extends ResourceGroupElement>) groupElements1;
+            List<? extends ResourceGroupElement> castedGroupElements2 = (List<? extends ResourceGroupElement>) groupElements2;
+            for (int i = 0; i < groupElements1.size(); i++) {
+                if (!equalGroupElements(castedGroupElements1.get(i).getElements(), castedGroupElements2.get(i).getElements())) {
+                    result = false;
+                }
+            }
+        } else {
+            List<? extends PresentationGroupElement> castedGroupElements1 = (List<? extends PresentationGroupElement>) groupElements1;
+            List<? extends PresentationGroupElement> castedGroupElements2 = (List<? extends PresentationGroupElement>) groupElements2;
+            for (int i = 0; i < groupElements1.size(); i++) {
+                if (!equalGroupElements(castedGroupElements1.get(i).getElements(), castedGroupElements2.get(i).getElements())) {
+                    result = false;
+                }
+            }
         }
 
         return result;
     }
+
 
     @AfterClass
     public void after() {

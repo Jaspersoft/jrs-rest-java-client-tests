@@ -26,13 +26,13 @@ public class DomainSchemaServiceTest extends RestClientTestUtil {
     }
 
     /*Enable the test if schema was not uploaded yet*/
-    @Test(enabled = false)
+    @Test(enabled = true)
     public void should_upload_domain_schema_to_server() {
         ClientFile schema = session
                 .domainService()
                 .forDomain("/public")
                 .schema()
-                .upload("schema.xml")
+                .upload("schema_tmp.xml", "schema_tmp.xml", "Description")
                 .getEntity();
         assertNotNull(schema);
     }

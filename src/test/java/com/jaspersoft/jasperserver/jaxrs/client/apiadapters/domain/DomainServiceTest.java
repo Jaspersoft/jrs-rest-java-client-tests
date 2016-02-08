@@ -13,8 +13,14 @@ import static org.testng.Assert.assertNotNull;
  */
 public class DomainServiceTest extends RestClientTestUtil{
 
-    private ClientSimpleDomain domain;
-    private final  String  TEST_DOMAIN_URI = "/public/Simple_Domain";
+    private ClientSimpleDomain simpleDomain = null;
+    private ClientSimpleDomain virtualDomain = null;
+    private ClientSimpleDomain supermartDomain = null;
+    private ClientSimpleDomain relativeDatesDomain = null;
+    private final  String SIMPLE_DOMAIN_URI = "/temp/DomainsCopy/Simple_Domain";
+    private final  String VIRTUAL_DS_DOMAIN_URI = "/temp/DomainsCopy/virtualDSDomain";
+    private final  String SUPERMART_DOMAIN_URI = "/temp/DomainsCopy/supermartDomain";
+    private final  String RELATIVE_DOMAIN_URI = "/temp/DomainsCopy/Relative_Dates_domain";
 
     @BeforeClass
     public void before() {
@@ -23,33 +29,121 @@ public class DomainServiceTest extends RestClientTestUtil{
     }
 
     @Test
-    public void should_get_domain() {
-        domain = session
+    public void should_get_simple_domain() {
+        simpleDomain = session
                 .domainService()
-                .domain(TEST_DOMAIN_URI)
+                .domain(SIMPLE_DOMAIN_URI)
                 .get()
                 .getEntity();
 
 
+        assertNotNull(simpleDomain);
+    }
+
+    @Test
+    public void should_get_virtual_ds_domain() {
+        virtualDomain = session
+                .domainService()
+                .domain(VIRTUAL_DS_DOMAIN_URI)
+                .get()
+                .getEntity();
+
+
+        assertNotNull(virtualDomain);
+    }
+
+
+    @Test
+    public void should_get_supermart_domain() {
+        supermartDomain = session
+                .domainService()
+                .domain(SUPERMART_DOMAIN_URI)
+                .get()
+                .getEntity();
+
+
+        assertNotNull(supermartDomain);
+    }
+
+
+    @Test
+    public void should_get_relative_dates_domain() {
+        relativeDatesDomain = session
+                .domainService()
+                .domain(RELATIVE_DOMAIN_URI)
+                .get()
+                .getEntity();
+
+
+        assertNotNull(relativeDatesDomain);
+    }
+
+    @Test(dependsOnMethods = "should_get_simple_domain")
+    public void should_create_simple_domain() {
+        ClientSimpleDomain newSimpleDomain = new ClientSimpleDomain(this.simpleDomain);
+        ClientSimpleDomain domain = session
+                .domainService()
+                .domain("/temp/DomainsRestCopies")
+                .create(newSimpleDomain)
+                .getEntity();
+
         assertNotNull(domain);
     }
 
-    @Test(dependsOnMethods = "should_get_domain")
-    public void should_update__domain() {
-        this.domain.setDescription("New simple domain");
+    @Test(dependsOnMethods = "should_get_virtual_ds_domain")
+    public void should_create_virtual_ds__domain() {
+        ClientSimpleDomain newVirtualDsDomain = new ClientSimpleDomain(this.virtualDomain);
         ClientSimpleDomain domain = session
                 .domainService()
-                .domain(TEST_DOMAIN_URI)
-                .update(this.domain)
+                .domain("/temp/DomainsRestCopies")
+                .create(newVirtualDsDomain)
+                .getEntity();
+
+        assertNotNull(domain);
+    }
+
+    @Test(dependsOnMethods = "should_get_supermart_domain")
+    public void should_create_supermart_domain() {
+        ClientSimpleDomain newSupermartDomain = new ClientSimpleDomain(this.supermartDomain);
+        ClientSimpleDomain domain = session
+                .domainService()
+                .domain("/temp/DomainsRestCopies")
+                .create(newSupermartDomain)
+                .getEntity();
+
+        assertNotNull(domain);
+    }
+
+
+    @Test(dependsOnMethods = "should_get_relative_dates_domain")
+    public void should_create_relative_dates_domain() {
+        ClientSimpleDomain newRelativeDatesDomain = new ClientSimpleDomain(this.relativeDatesDomain);
+        ClientSimpleDomain domain = session
+                .domainService()
+                .domain("/temp/DomainsRestCopies")
+                .create(newRelativeDatesDomain)
+                .getEntity();
+
+        assertNotNull(domain);
+    }
+
+    @Test(dependsOnMethods = "should_get_domain", enabled = false)
+    public void should_update_domain() {
+        this.simpleDomain.setDescription("New simple domain");
+        ClientSimpleDomain domain = session
+                .domainService()
+                .domain(SIMPLE_DOMAIN_URI)
+                .update(this.simpleDomain)
                 .getEntity();
 
 
         assertNotNull(domain);
     }
 
-    @Test(dependsOnMethods = "should_get_domain")
+
+    @Test(dependsOnMethods = "should_get_domain", enabled = false)
     public void should_create__domain() {
-        ClientSimpleDomain simpleDomain = new ClientSimpleDomain(domain);
+        ClientSimpleDomain simpleDomain = new ClientSimpleDomain(this.simpleDomain);
         simpleDomain.setUri("/public/new_simple_domain");
         simpleDomain.setLabel("New simple domain");
         ClientSimpleDomain domain = session

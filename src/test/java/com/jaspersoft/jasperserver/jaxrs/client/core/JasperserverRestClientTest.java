@@ -42,7 +42,7 @@ public class JasperserverRestClientTest extends RestClientTestUtil {
 
     @Test (expectedExceptions = JSClientWebException.class)
     public void should_not_return_session_id_with_wrong_credentials_via_j_sucurity_check() {
-        session = client.authenticate(USER_NAME, PASSWORD);
+        session = client.authenticate("user", "password");
 
     }
 

@@ -24,7 +24,8 @@ public class DomainMetadataServiceTest extends RestClientTestUtil{
     public void should_return_domain_metadata() {
 
         DomainMetaData domainMetaData = session.domainService()
-                .domainMetadata("/organizations/organization_1/Domains/Simple_Domain")
+                .forDomain("/organizations/organization_1/Domains/Simple_Domain")
+                .metadata()
                 .retrieve()
                 .getEntity();
         assertNotNull(domainMetaData);
@@ -33,6 +34,6 @@ public class DomainMetadataServiceTest extends RestClientTestUtil{
 
     @AfterClass
     public  void after() {
-     session.logout();
+        session.logout();
     }
 }

@@ -3,8 +3,8 @@ package com.jaspersoft.jasperserver.jaxrs.client.apiadapters.domain;
 import com.jaspersoft.jasperserver.dto.resources.domain.ClientDomain;
 import com.jaspersoft.jasperserver.jaxrs.client.RestClientTestUtil;
 import com.jaspersoft.jasperserver.jaxrs.client.core.operationresult.OperationResult;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
+import org.testng.annotations.AfterGroups;
+import org.testng.annotations.BeforeGroups;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertTrue;
@@ -21,7 +21,7 @@ public class DomainServiceTest extends RestClientTestUtil{
     private static final  String SUPERMART_DOMAIN_URI = "/public/Samples/Domains/supermartDomain";
     private static final  String RELATIVE_DOMAIN_URI = "/organizations/organization_1/Domains/Relative_Dates_domain";
 
-    @BeforeClass
+    @BeforeGroups(groups = {"domains"})
     public void before() {
         initClient();
         initSession();
@@ -54,18 +54,18 @@ public class DomainServiceTest extends RestClientTestUtil{
                 .get()
                 .getEntity();
 
-        ClientDomain cloneOfDomain = new ClientDomain(domain);
+        domain.setSecurityFile(null);
+        domain.setBundles(null);
 
-        cloneOfDomain.setSecurityFile(null);
-        cloneOfDomain.setBundles(null);
+        ClientDomain cloneOfDomain = new ClientDomain(domain);
 
         OperationResult<ClientDomain> operationResult = session
                 .domainService()
                 .domain(destinationUri)
-                .create(domain);
+                .create(cloneOfDomain);
 
 
-        String uri = completeClonedDomainUri(domainUri, destinationUri);
+        String uri = completeClonedDomainUri(cloneOfDomain.getLabel(), destinationUri);
 
         ClientDomain retrievedDomain = session
                 .domainService()
@@ -84,12 +84,12 @@ public class DomainServiceTest extends RestClientTestUtil{
         return domain.equals(retrievedDomain);
     }
 
-    private String completeClonedDomainUri(String domaunUri, String destinationFolder) {
-    return new StringBuilder(destinationFolder).append(domaunUri.substring(domaunUri.lastIndexOf("/"))).toString();
+    private String completeClonedDomainUri(String label, String destinationFolder) {
+    return new StringBuilder(destinationFolder).append("/").append(label.replaceAll(" ", "_")).toString();
     }
 
 
-    @AfterClass
+    @AfterGroups(groups = {"domains"})
     public  void after() {
      session.logout();
     }

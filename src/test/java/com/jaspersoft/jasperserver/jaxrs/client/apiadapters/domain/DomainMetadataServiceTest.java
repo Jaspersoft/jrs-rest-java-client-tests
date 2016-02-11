@@ -36,6 +36,6 @@ public class DomainMetadataServiceTest extends RestClientTestUtil{
 
     @AfterClass
     public  void after() {
-     session.logout();
+        session.logout();
     }
 }

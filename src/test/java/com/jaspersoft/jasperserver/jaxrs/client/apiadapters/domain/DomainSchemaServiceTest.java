@@ -16,9 +16,10 @@ import static org.testng.Assert.assertNotNull;
  */
 public class DomainSchemaServiceTest extends RestClientTestUtil {
 
-    public static final String PARENT_URI = "/public";
-    private static final String SCHEMA_URI = "/public/schema.xml";
-    private static final String SIMPLE_SCHEMA_URI = "/public/Simple_Domain_schema";
+
+    private final String SCHEMA_URI = "/public/schema.xml";
+    private final String SIMPLE_SCHEMA_URI = "/public/Simple_Domain_schema";
+
 
     @BeforeClass
     public void before() {
@@ -31,9 +32,9 @@ public class DomainSchemaServiceTest extends RestClientTestUtil {
     public void should_upload_domain_schema_to_server() {
         ClientFile schema = session
                 .domainService()
-                .forDomain(PARENT_URI)
+                .forDomain("/public")
                 .schema()
-                .upload("schema.xml", "schema.xml", "Description")
+                .upload("schema_tmp.xml", "schema_tmp.xml", "Description")
                 .getEntity();
         assertNotNull(schema);
     }
@@ -44,7 +45,7 @@ public class DomainSchemaServiceTest extends RestClientTestUtil {
         session.getStorage().getConfiguration().setAcceptMimeType(MimeType.JSON);
         ClientSchema schema = session
                 .domainService()
-                .forDomain(SIMPLE_SCHEMA_URI)
+                .forDomain(SCHEMA_URI)
                 .schema()
                 .get()
                 .getEntity();

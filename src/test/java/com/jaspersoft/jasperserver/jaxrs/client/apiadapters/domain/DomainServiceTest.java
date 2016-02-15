@@ -1,71 +1,115 @@
 package com.jaspersoft.jasperserver.jaxrs.client.apiadapters.domain;
 
+import com.jaspersoft.jasperserver.dto.resources.ClientResourceListWrapper;
+import com.jaspersoft.jasperserver.dto.resources.ClientResourceLookup;
+import com.jaspersoft.jasperserver.dto.resources.ResourceMediaType;
 import com.jaspersoft.jasperserver.dto.resources.domain.ClientDomain;
 import com.jaspersoft.jasperserver.jaxrs.client.RestClientTestUtil;
+import com.jaspersoft.jasperserver.jaxrs.client.apiadapters.importexport.importservice.ImportParameter;
+import com.jaspersoft.jasperserver.jaxrs.client.apiadapters.resources.ResourceSearchParameter;
+import com.jaspersoft.jasperserver.jaxrs.client.core.exceptions.JSClientWebException;
 import com.jaspersoft.jasperserver.jaxrs.client.core.operationresult.OperationResult;
+import com.jaspersoft.jasperserver.jaxrs.client.dto.importexport.StateDto;
+import java.io.File;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.List;
 import org.testng.annotations.AfterGroups;
 import org.testng.annotations.BeforeGroups;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertTrue;
 
+
 /**
  * @author Tetiana Iefimenko
  */
-public class DomainServiceTest extends RestClientTestUtil{
+public class DomainServiceTest extends RestClientTestUtil {
 
-    public static final String DESTINATION_URI = "/temp";
 
-    private static final  String SIMPLE_DOMAIN_URI = "/organizations/organization_1/Domains/Simple_Domain";
-    private static final  String VIRTUAL_DS_DOMAIN_URI = "/organizations/organization_1/Domains/virtualDSDomain";
-    private static final  String SUPERMART_DOMAIN_URI = "/public/Samples/Domains/supermartDomain";
-    private static final  String RELATIVE_DOMAIN_URI = "/organizations/organization_1/Domains/Relative_Dates_domain";
+    public static final String RESOURCES_LOCAL_FOLDER = "D:\\workspaceIdea\\jrs-rest-java-client-tests\\src\\main\\resources\\imports\\domains";
+    public static final String EXPORT_SERVER_URI = "/temp/exportResources";
+    public static final String DESTINATION_COPY_URI = "/temp/DomainsRestCopies";
+    public static final String INPROGRESS_STATUS = "inprogress";
 
     @BeforeGroups(groups = {"domains"})
     public void before() {
         initClient();
         initSession();
+
+        /*
+        * Upload source data to server
+        * */
+        try {
+            loadResources(RESOURCES_LOCAL_FOLDER);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Test(groups = {"domains"})
-    public void should_get_cloned_simple_domain() {
-        assertTrue(runTest(SIMPLE_DOMAIN_URI, DESTINATION_URI));
+    public void should_get_copy_and_compare_domains() throws URISyntaxException, InterruptedException {
+
+        /*
+        * Get all domains as resources from server
+        * */
+
+        ClientResourceListWrapper list = session
+                .resourcesService()
+                .resources()
+                .parameter(ResourceSearchParameter.FOLDER_URI, EXPORT_SERVER_URI)
+                .parameter(ResourceSearchParameter.TYPE, ResourceMediaType.SEMANTIC_LAYER_DATA_SOURCE_CLIENT_TYPE)
+                .search()
+                .getEntity();
+
+        List<Boolean> resultList = new ArrayList<Boolean>(list.getResourceLookups().size());
+        for (ClientResourceLookup resourceLookup : list.getResourceLookups()) {
+
+            /*
+            * Each resource get as domain, clone, post to server, get posted clone and compare with uploaded domain
+            * */
+            resultList.add(executeTest(resourceLookup));
+        }
+        assertTrue(!resultList.contains(Boolean.FALSE));
     }
 
-    @Test(groups = {"domains"})
-    public void should_get_cloned_supermart_domain() {
-        assertTrue(runTest(SUPERMART_DOMAIN_URI, DESTINATION_URI));
-    }
+    private Boolean executeTest(ClientResourceLookup clientResourceLookup) throws URISyntaxException, InterruptedException {
 
-    @Test(groups = {"domains"})
-    public void should_get_cloned_virtual_ds_domain() {
-        assertTrue(runTest(VIRTUAL_DS_DOMAIN_URI, DESTINATION_URI));
-    }
-
-    @Test(groups = {"domains"})
-    public void should_get_cloned_relative_dates_domain() {
-        assertTrue(runTest(RELATIVE_DOMAIN_URI, DESTINATION_URI));
-    }
-
-    private Boolean runTest(String domainUri, String destinationUri) {
+            /*
+            * Get domain form server
+            * */
         ClientDomain domain = session
                 .domainService()
-                .domain(domainUri)
+                .domain(clientResourceLookup.getUri())
                 .get()
                 .getEntity();
 
         domain.setSecurityFile(null);
         domain.setBundles(null);
 
-        ClientDomain cloneOfDomain = new ClientDomain(domain);
+        /*
+        *
+        * Clone domain*/
+        ClientDomain clonedDomain = new ClientDomain(domain);
 
-        OperationResult<ClientDomain> operationResult = session
-                .domainService()
-                .domain(destinationUri)
-                .create(cloneOfDomain);
+        /*
+        * Post domain to server
+        * */
+        try {
+            OperationResult<ClientDomain> operationResult = session
+                    .domainService()
+                    .domain(DESTINATION_COPY_URI)
+                    .create(clonedDomain);
+        } catch (JSClientWebException e) {
+            return Boolean.FALSE;
+        }
 
 
-        String uri = completeClonedDomainUri(cloneOfDomain.getLabel(), destinationUri);
+        String uri = completeClonedDomainUri(clonedDomain.getLabel(), DESTINATION_COPY_URI);
+
+        /*
+        * Get cloned domain from server
+        * */
 
         ClientDomain retrievedDomain = session
                 .domainService()
@@ -85,12 +129,37 @@ public class DomainServiceTest extends RestClientTestUtil{
     }
 
     private String completeClonedDomainUri(String label, String destinationFolder) {
-    return new StringBuilder(destinationFolder).append("/").append(label.replaceAll(" ", "_")).toString();
+        return new StringBuilder(destinationFolder).append("/").append(label.replaceAll(" ", "_")).toString();
+    }
+
+    private void loadResources(String folderName) throws URISyntaxException, InterruptedException {
+
+        File folder = new File(folderName);
+        File[] listOfResources = folder.listFiles();
+        if (listOfResources.length > 0) {
+            for (File listOfResource : listOfResources) {
+                OperationResult<StateDto> operationResult = session
+                        .importService()
+                        .newTask()
+                        .parameter(ImportParameter.INCLUDE_ACCESS_EVENTS, true)
+                        .create(listOfResource);
+
+                StateDto stateDto = operationResult.getEntity();
+
+                while (stateDto.getPhase().equals(INPROGRESS_STATUS)) {
+                    stateDto = session
+                            .importService()
+                            .task(stateDto.getId())
+                            .state().getEntity();
+                    Thread.sleep(100);
+                }
+            }
+        }
     }
 
 
     @AfterGroups(groups = {"domains"})
-    public  void after() {
-     session.logout();
+    public void after() {
+        session.logout();
     }
 }

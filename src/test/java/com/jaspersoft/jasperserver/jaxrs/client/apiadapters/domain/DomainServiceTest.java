@@ -81,11 +81,12 @@ public class DomainServiceTest extends RestClientTestUtil {
             }
         }
         if (resultMap.size() != 0) {
-             if (LOGGER.getLevel().equals(Level.DEBUG)) {
-                 LOGGER.debug(resultMap.keySet().toString());
-             } else {
-                 LOGGER.info(resultMap.toString());
-             }
+            LOGGER.info("FAILED DOMAINS:");
+            if (LOGGER.getLevel().equals(Level.DEBUG)) {
+                LOGGER.debug(resultMap.toString());
+            }  else  {
+                LOGGER.info(resultMap.keySet().toString());
+            }
         }
         assertTrue(resultMap.size() == 0);
     }
@@ -113,14 +114,15 @@ public class DomainServiceTest extends RestClientTestUtil {
         * Post domain to server
         * */
 
+        String newUri = clientResourceLookup.getUri().replace(EXPORT_SERVER_URI, DESTINATION_COPY_URI);
         OperationResult<ClientDomain> operationResult = session
                 .domainService()
-                .domain(DESTINATION_COPY_URI)
-                .create(clonedDomain);
-        if (operationResult.getResponse().getStatus() != 201) return operationResult.getSerializedContent();
+                .domain(newUri)
+                .update(clonedDomain);
+        if (operationResult.getResponse().getStatus() != 200) return operationResult.getSerializedContent();
 
 
-        String uri = completeClonedDomainUri(clonedDomain.getLabel(), DESTINATION_COPY_URI);
+//        String uri = completeClonedDomainUri(clonedDomain.getLabel(), newUri);
 
         /*
         * Get cloned domain from server
@@ -128,7 +130,7 @@ public class DomainServiceTest extends RestClientTestUtil {
 
         ClientDomain retrievedDomain = session
                 .domainService()
-                .domain(uri)
+                .domain(newUri)
                 .get()
                 .getEntity();
 
@@ -143,8 +145,11 @@ public class DomainServiceTest extends RestClientTestUtil {
         return (domain.equals(retrievedDomain)) ? null : "Domains are not equal";
     }
 
-    private String completeClonedDomainUri(String label, String destinationFolder) {
-        return new StringBuilder(destinationFolder).append("/").append(label.replaceAll(" ", "_")).toString();
+    private String completeClonedDomainUri(String label, String uri) {
+        return new StringBuilder(uri.replace(EXPORT_SERVER_URI, DESTINATION_COPY_URI))
+                .append("/")
+                .append(label.replaceAll(" ", "_"))
+                .toString();
     }
 
     private void loadTestResources(String folderName) throws URISyntaxException, InterruptedException {

@@ -14,6 +14,7 @@ import java.io.File;
 import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.testng.annotations.AfterGroups;
 import org.testng.annotations.BeforeGroups;
@@ -26,12 +27,14 @@ import static org.testng.Assert.assertTrue;
  */
 public class DomainServiceTest extends RestClientTestUtil {
 
-    public static final String RESOURCES_LOCAL_FOLDER = "D:\\workspaceIdea\\jrs-rest-java-client-tests\\src\\main\\resources\\imports\\domains";
-    public static final String EXPORT_SERVER_URI = "/temp/exportResources";
-    public static final String DESTINATION_COPY_URI = "/temp/DomainsRestCopies";
-    public static final String DESTINATION_COPY_LABEL = "DomainsRestCopies";
-    public static final String INPROGRESS_STATUS = "inprogress";
-    public static final String NEW_LINE_CHARS = "\n\n";
+    private static final String RESOURCES_LOCAL_FOLDER = "D:\\workspaceIdea\\jrs-rest-java-client-tests\\src\\main\\resources\\imports\\domains";
+    private static final String EXPORT_SERVER_URI = "/temp/exportResources";
+    private static final String DESTINATION_COPY_URI = "/temp/DomainsRestCopies";
+    private static final String DESTINATION_COPY_LABEL = "DomainsRestCopies";
+
+    private static final String INPROGRESS_STATUS = "inprogress";
+    private static final String NEW_LINE_CHARS = "\n\n";
+    public static final Logger LOGGER = Logger.getLogger("consoleLogger");
 
     @BeforeGroups(groups = {"domains"})
     public void before() {
@@ -78,7 +81,12 @@ public class DomainServiceTest extends RestClientTestUtil {
             }
         }
         if (resultMap.size() != 0) {
-            Logger.getLogger("consoleLogger").info(resultMap.toString());}
+             if (LOGGER.getLevel().equals(Level.DEBUG)) {
+                 LOGGER.debug(resultMap.keySet().toString());
+             } else {
+                 LOGGER.info(resultMap.toString());
+             }
+        }
         assertTrue(resultMap.size() == 0);
     }
 

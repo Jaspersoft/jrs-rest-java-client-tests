@@ -1,6 +1,7 @@
 package com.jaspersoft.jasperserver.jaxrs.client.apiadapters.domain;
 
 import com.jaspersoft.jasperserver.dto.resources.ClientFolder;
+import com.jaspersoft.jasperserver.dto.resources.ClientResource;
 import com.jaspersoft.jasperserver.dto.resources.ClientResourceListWrapper;
 import com.jaspersoft.jasperserver.dto.resources.ClientResourceLookup;
 import com.jaspersoft.jasperserver.dto.resources.ResourceMediaType;
@@ -35,23 +36,26 @@ public class DomainServiceTest extends RestClientTestUtil {
 
     private static final String INPROGRESS_STATUS = "inprogress";
     private static final String NEW_LINE_CHARS = "\n\n";
-    public static final Logger LOGGER = Logger.getLogger("consoleLogger");
+    public static final Logger CONSOLE_LOGGER = Logger.getLogger("consoleLogger");
+    public static final Logger TEST_LOGGER = Logger.getLogger(DomainServiceTest.class.getName());
 
     @BeforeGroups(groups = {"domains"})
     public void before() {
         initClient();
         initSession();
         session.getStorage().getConfiguration().setHandleErrors(false);
-
+        TEST_LOGGER.debug("Start to create test folders on server");
         createTestResource();
-
+        TEST_LOGGER.debug("Test folders were created successfully");
         /*
         * Upload source data to server
         * */
+        TEST_LOGGER.debug("Start to load test resources to server");
         try {
             loadTestResources(RESOURCES_LOCAL_FOLDER);
+            TEST_LOGGER.debug("Test resources was loaded successfully");
         } catch (Exception e) {
-            e.printStackTrace();
+            TEST_LOGGER.debug("Test resources were not loaded resources of exception", e);
         }
     }
 
@@ -80,10 +84,10 @@ public class DomainServiceTest extends RestClientTestUtil {
             if (result != null) {
                 resultMap.put(resourceLookup.getUri(), result);
                 if (resultMap.size() != 0) {
-                    if (LOGGER.getLevel().equals(Level.DEBUG)) {
-                        LOGGER.debug(NEW_LINE_CHARS + resourceLookup.getUri() + " : " + result);
+                    if (CONSOLE_LOGGER.getLevel().equals(Level.DEBUG)) {
+                        CONSOLE_LOGGER.debug(NEW_LINE_CHARS + resourceLookup.getUri() + " : " + result);
                     } else {
-                        LOGGER.info(NEW_LINE_CHARS + resourceLookup.getUri());
+                        CONSOLE_LOGGER.info(NEW_LINE_CHARS + resourceLookup.getUri());
                     }
                 }
             }
@@ -93,7 +97,7 @@ public class DomainServiceTest extends RestClientTestUtil {
     }
 
     private String executeTest(ClientResourceLookup clientResourceLookup) throws URISyntaxException, InterruptedException {
-
+        TEST_LOGGER.debug("Start to test " + clientResourceLookup.getUri());
             /*
             * Get domain form server
             * */
@@ -104,7 +108,11 @@ public class DomainServiceTest extends RestClientTestUtil {
                 .get();
         try {
             domain = operationResult.getEntity();
+            TEST_LOGGER.debug("GET domain from server");
         } catch (JSClientWebException e) {
+            TEST_LOGGER.info("GET " + clientResourceLookup.getUri()
+                    + " from server failed with error "
+                    + operationResult.getSerializedContent());
             return operationResult.getSerializedContent();
         }
         domain.setSecurityFile(null);
@@ -126,7 +134,13 @@ public class DomainServiceTest extends RestClientTestUtil {
                     .domain(newUri)
                     .update(clonedDomain);
             operationResult.getEntity();
+            TEST_LOGGER.debug("PUT domain to server");
         } catch (Exception e) {
+            TEST_LOGGER.info("PUT domain "
+                    + clonedDomain.getUri()
+                    + " to server failed with error "
+                    + NEW_LINE_CHARS
+                    + operationResult.getSerializedContent());
             return operationResult.getSerializedContent();
         }
         /*
@@ -141,7 +155,12 @@ public class DomainServiceTest extends RestClientTestUtil {
                 .get();
         try {
             retrievedDomain = operationResult.getEntity();
+            TEST_LOGGER.debug("GET domain from server");
         } catch (JSClientWebException e) {
+            TEST_LOGGER.info("GET "
+                    + clientResourceLookup.getUri()
+                    + " from server failed with error "
+                    + operationResult.getSerializedContent());
             return operationResult.getSerializedContent();
         }
         domain.setCreationDate(null);
@@ -152,20 +171,33 @@ public class DomainServiceTest extends RestClientTestUtil {
         retrievedDomain.setUpdateDate(null);
         retrievedDomain.setUri(null);
 
-        return (domain.equals(retrievedDomain)) ? null : "Domains are not equal";
+        TEST_LOGGER.debug("Compare original and cloned domains");
+        if (domain.equals(retrievedDomain)) {
+            TEST_LOGGER.debug("Domains are equal, test for " + domain.getLabel() + " passed");
+            return null;
+        } else {
+            TEST_LOGGER.info("Domains are not equal, test for " + domain.getLabel() + " filed");
+            return "Domains are not equal";
+        }
     }
 
     private void loadTestResources(String folderName) throws URISyntaxException, InterruptedException {
-
+        TEST_LOGGER.debug("Start to scan import local folder");
         File folder = new File(folderName);
         File[] listOfResources = folder.listFiles();
         if (listOfResources.length > 0) {
-            for (File listOfResource : listOfResources) {
+            TEST_LOGGER.debug("For upload were founded " + listOfResources.length + "resources");
+        } else {
+            TEST_LOGGER.debug("Resources were not founded");
+            return;
+        }
+        if (listOfResources.length > 0) {
+            for (File resource : listOfResources) {
                 OperationResult<StateDto> operationResult = session
                         .importService()
                         .newTask()
                         .parameter(ImportParameter.INCLUDE_ACCESS_EVENTS, true)
-                        .create(listOfResource);
+                        .create(resource);
 
                 StateDto stateDto = operationResult.getEntity();
 
@@ -176,6 +208,7 @@ public class DomainServiceTest extends RestClientTestUtil {
                             .state().getEntity();
                     Thread.sleep(100);
                 }
+                TEST_LOGGER.debug(resource.getName() + " was uploaded successfully");
             }
         }
     }
@@ -189,10 +222,13 @@ public class DomainServiceTest extends RestClientTestUtil {
                 .setDescription("Test folder")
                 .setVersion(0);
 
-        session
+        OperationResult<ClientResource> operationResult = session
                 .resourcesService()
                 .resource(folder.getUri())
                 .createOrUpdate(folder);
+        if (operationResult.getResponse().getStatus() == 200) {
+            TEST_LOGGER.debug("Test folder " + DESTINATION_COPY_URI + " was created successfully");
+        }
 
     }
 

@@ -8,6 +8,7 @@ import com.jaspersoft.jasperserver.dto.resources.domain.ClientDomain;
 import com.jaspersoft.jasperserver.jaxrs.client.RestClientTestUtil;
 import com.jaspersoft.jasperserver.jaxrs.client.apiadapters.importexport.importservice.ImportParameter;
 import com.jaspersoft.jasperserver.jaxrs.client.apiadapters.resources.ResourceSearchParameter;
+import com.jaspersoft.jasperserver.jaxrs.client.core.exceptions.JSClientWebException;
 import com.jaspersoft.jasperserver.jaxrs.client.core.operationresult.OperationResult;
 import com.jaspersoft.jasperserver.jaxrs.client.dto.importexport.StateDto;
 import java.io.File;
@@ -77,17 +78,17 @@ public class DomainServiceTest extends RestClientTestUtil {
             * */
             String result = executeTest(resourceLookup);
             if (result != null) {
-                resultMap.put(NEW_LINE_CHARS + resourceLookup.getUri(), result);
+                resultMap.put(resourceLookup.getUri(), result);
+                if (resultMap.size() != 0) {
+                    if (LOGGER.getLevel().equals(Level.DEBUG)) {
+                        LOGGER.debug(NEW_LINE_CHARS + resourceLookup.getUri() + " : " + result);
+                    } else {
+                        LOGGER.info(NEW_LINE_CHARS + resourceLookup.getUri());
+                    }
+                }
             }
         }
-        if (resultMap.size() != 0) {
-            LOGGER.info("FAILED DOMAINS:");
-            if (LOGGER.getLevel().equals(Level.DEBUG)) {
-                LOGGER.debug(resultMap.toString());
-            }  else  {
-                LOGGER.info(resultMap.keySet().toString());
-            }
-        }
+
         assertTrue(resultMap.size() == 0);
     }
 
@@ -96,12 +97,16 @@ public class DomainServiceTest extends RestClientTestUtil {
             /*
             * Get domain form server
             * */
-        ClientDomain domain = session
+        ClientDomain domain;
+        OperationResult<ClientDomain> operationResult = session
                 .domainService()
                 .domain(clientResourceLookup.getUri())
-                .get()
-                .getEntity();
-
+                .get();
+        try {
+            domain = operationResult.getEntity();
+        } catch (JSClientWebException e) {
+            return operationResult.getSerializedContent();
+        }
         domain.setSecurityFile(null);
         domain.setBundles(null);
 
@@ -115,25 +120,30 @@ public class DomainServiceTest extends RestClientTestUtil {
         * */
 
         String newUri = clientResourceLookup.getUri().replace(EXPORT_SERVER_URI, DESTINATION_COPY_URI);
-        OperationResult<ClientDomain> operationResult = session
-                .domainService()
-                .domain(newUri)
-                .update(clonedDomain);
-        if (operationResult.getResponse().getStatus() != 200) return operationResult.getSerializedContent();
-
-
-//        String uri = completeClonedDomainUri(clonedDomain.getLabel(), newUri);
-
+        try {
+            operationResult = session
+                    .domainService()
+                    .domain(newUri)
+                    .update(clonedDomain);
+            operationResult.getEntity();
+        } catch (Exception e) {
+            return operationResult.getSerializedContent();
+        }
         /*
         * Get cloned domain from server
         * */
 
-        ClientDomain retrievedDomain = session
+        ClientDomain retrievedDomain;
+
+        operationResult = session
                 .domainService()
                 .domain(newUri)
-                .get()
-                .getEntity();
-
+                .get();
+        try {
+            retrievedDomain = operationResult.getEntity();
+        } catch (JSClientWebException e) {
+            return operationResult.getSerializedContent();
+        }
         domain.setCreationDate(null);
         domain.setUpdateDate(null);
         domain.setUri(null);
@@ -143,13 +153,6 @@ public class DomainServiceTest extends RestClientTestUtil {
         retrievedDomain.setUri(null);
 
         return (domain.equals(retrievedDomain)) ? null : "Domains are not equal";
-    }
-
-    private String completeClonedDomainUri(String label, String uri) {
-        return new StringBuilder(uri.replace(EXPORT_SERVER_URI, DESTINATION_COPY_URI))
-                .append("/")
-                .append(label.replaceAll(" ", "_"))
-                .toString();
     }
 
     private void loadTestResources(String folderName) throws URISyntaxException, InterruptedException {

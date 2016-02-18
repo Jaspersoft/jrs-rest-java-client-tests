@@ -16,7 +16,6 @@ import java.io.File;
 import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
-import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.testng.annotations.AfterGroups;
 import org.testng.annotations.BeforeGroups;
@@ -35,7 +34,6 @@ public class DomainServiceTest extends RestClientTestUtil {
     private static final String DESTINATION_COPY_LABEL = "DomainsRestCopies";
 
     private static final String INPROGRESS_STATUS = "inprogress";
-    private static final String NEW_LINE_CHARS = "\n\n";
     public static final Logger CONSOLE_LOGGER = Logger.getLogger("consoleLogger");
     public static final Logger TEST_LOGGER = Logger.getLogger(DomainServiceTest.class.getName());
 
@@ -83,16 +81,13 @@ public class DomainServiceTest extends RestClientTestUtil {
             String result = executeTest(resourceLookup);
             if (result != null) {
                 resultMap.put(resourceLookup.getUri(), result);
-                if (resultMap.size() != 0) {
-                    if (CONSOLE_LOGGER.getLevel().equals(Level.DEBUG)) {
-                        CONSOLE_LOGGER.debug(NEW_LINE_CHARS + resourceLookup.getUri() + " : " + result);
-                    } else {
-                        CONSOLE_LOGGER.info(NEW_LINE_CHARS + resourceLookup.getUri());
-                    }
+                if (CONSOLE_LOGGER.isDebugEnabled()) {
+                    CONSOLE_LOGGER.debug(resourceLookup.getUri() + " domain failed with message " + result);
+                } else {
+                    CONSOLE_LOGGER.info(resourceLookup.getUri() + " domain failed");
                 }
             }
         }
-
         assertTrue(resultMap.size() == 0);
     }
 
@@ -108,11 +103,16 @@ public class DomainServiceTest extends RestClientTestUtil {
                 .get();
         try {
             domain = operationResult.getEntity();
-            TEST_LOGGER.debug("GET domain from server");
+            TEST_LOGGER.debug("GET " + clientResourceLookup.getUri() + " domain from server was done successfully");
         } catch (JSClientWebException e) {
             TEST_LOGGER.info("GET " + clientResourceLookup.getUri()
-                    + " from server failed with error "
-                    + operationResult.getSerializedContent());
+                    + " from server failed with error code "
+                    + operationResult.getResponseStatus());
+            if (TEST_LOGGER.isTraceEnabled())
+                TEST_LOGGER.trace(operationResult.getSerializedContent());
+            TEST_LOGGER.info("COPY of " + clientResourceLookup.getUri() + " skipped");
+            TEST_LOGGER.info("GET copy of " + clientResourceLookup.getUri() + " skipped");
+            TEST_LOGGER.info("Comparison of original and copied " + clientResourceLookup.getLabel() + " skipped");
             return operationResult.getSerializedContent();
         }
         domain.setSecurityFile(null);
@@ -134,13 +134,16 @@ public class DomainServiceTest extends RestClientTestUtil {
                     .domain(newUri)
                     .update(clonedDomain);
             operationResult.getEntity();
-            TEST_LOGGER.debug("PUT domain to server");
+            TEST_LOGGER.debug("COPY of " + clientResourceLookup.getUri() + " domain to server was done successfully");
         } catch (Exception e) {
-            TEST_LOGGER.info("PUT domain "
-                    + clonedDomain.getUri()
-                    + " to server failed with error "
-                    + NEW_LINE_CHARS
-                    + operationResult.getSerializedContent());
+            TEST_LOGGER.info("COPY of "
+                    + clientResourceLookup.getUri()
+                    + " to server failed with error code "
+                    + operationResult.getResponseStatus());
+            if (TEST_LOGGER.isTraceEnabled())
+                TEST_LOGGER.trace(operationResult.getSerializedContent());
+            TEST_LOGGER.info("GET copy of " + clientResourceLookup.getUri() + " skipped");
+            TEST_LOGGER.info("Comparison of original and copied " + domain.getLabel() + " skipped");
             return operationResult.getSerializedContent();
         }
         /*
@@ -155,12 +158,14 @@ public class DomainServiceTest extends RestClientTestUtil {
                 .get();
         try {
             retrievedDomain = operationResult.getEntity();
-            TEST_LOGGER.debug("GET domain from server");
+            TEST_LOGGER.debug("GET copy of domain from server" + clientResourceLookup.getUri() + "was done successfully");
         } catch (JSClientWebException e) {
-            TEST_LOGGER.info("GET "
-                    + clientResourceLookup.getUri()
-                    + " from server failed with error "
-                    + operationResult.getSerializedContent());
+            TEST_LOGGER.info("GET copy of " + clientResourceLookup.getUri()
+                    + " from server failed with error code "
+                    + operationResult.getResponseStatus());
+            if (TEST_LOGGER.isTraceEnabled())
+                TEST_LOGGER.trace(operationResult.getSerializedContent());
+            TEST_LOGGER.info("Comparison of original and copied " + domain.getLabel() + " skipped");
             return operationResult.getSerializedContent();
         }
         domain.setCreationDate(null);
@@ -171,12 +176,12 @@ public class DomainServiceTest extends RestClientTestUtil {
         retrievedDomain.setUpdateDate(null);
         retrievedDomain.setUri(null);
 
-        TEST_LOGGER.debug("Compare original and cloned domains");
+        TEST_LOGGER.debug("Comparison of original and copied domains");
         if (domain.equals(retrievedDomain)) {
-            TEST_LOGGER.debug("Domains are equal, test for " + domain.getLabel() + " passed");
+            TEST_LOGGER.debug("Comparison of original and copied " + domain.getLabel() + " passed");
             return null;
         } else {
-            TEST_LOGGER.info("Domains are not equal, test for " + domain.getLabel() + " filed");
+            TEST_LOGGER.info("Comparison of original and copied " + domain.getLabel() + " filed");
             return "Domains are not equal";
         }
     }

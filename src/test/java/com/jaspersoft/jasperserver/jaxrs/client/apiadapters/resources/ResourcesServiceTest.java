@@ -104,14 +104,12 @@ public class ResourcesServiceTest extends RestClientTestUtil {
         // When
         ClientResource clientResource = session.resourcesService()
                 .resource("/public")
-                .copyFrom("/Domains/Simple_Domain_files/Simple_Domain_schema")
+                .copyFrom("/public/Simple_Domain_files/Simple_Domain_schema")
                 .getEntity();
 
         Assert.assertNotNull(clientResource);
         Assert.assertNotNull(clientResource.getCreationDate());
     }
-
-
 
     @Test
     public void should_return_resource() throws InterruptedException {

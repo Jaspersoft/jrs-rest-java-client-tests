@@ -86,11 +86,8 @@ public class JdbcConnectionsServiceTest extends RestClientTestUtil {
     public void should_get_metadata() {
         OperationResult<ResourceGroupElement> operationResult = session
                 .connectionsService()
-                .connection(ClientJdbcDataSource.class,
-                        ConnectionMediaType.JDBC_DATA_SOURCE_TYPE,
-                        ResourceGroupElement.class,
-                        ConnectionMediaType.JDBC_DATA_SOURCE_METADATA_TYPE,
-                        uuId)
+                .connection(uuId, ResourceGroupElement.class,
+                        ConnectionMediaType.JDBC_DATA_SOURCE_METADATA_TYPE)
                 .metadata();
 
         assertNotNull(operationResult);
@@ -115,8 +112,7 @@ public class JdbcConnectionsServiceTest extends RestClientTestUtil {
                 .connection(ClientJdbcDataSource.class,
                         ConnectionMediaType.JDBC_DATA_SOURCE_TYPE,
                         ResourceGroupElement.class,
-                        ConnectionMediaType.JDBC_DATA_SOURCE_METADATA_TYPE,
-                        uuId)
+                        ConnectionMediaType.JDBC_DATA_SOURCE_METADATA_TYPE)
                 .createAndGetMetadata(connection);
 
         assertNotNull(operationResult);

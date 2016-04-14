@@ -28,7 +28,7 @@ public class DomainContextTest extends RestClientTestUtil {
     public void before() {
         initClient();
         initSession();
-        domainContext = new ClientDomain().setUri("/temp/supermartDomain");
+        domainContext = new ClientDomain().setUri("/organizations/organization_1/Domains/Simple_Domain");
     }
 
     @AfterClass
@@ -63,7 +63,7 @@ public class DomainContextTest extends RestClientTestUtil {
         assertNotNull(operationResult.getEntity());
     }
 
-    @Test(dependsOnMethods = "should_get_metadata")
+    @Test
     public void should_create_context_and_get_metadata() {
         OperationResult<DataIslandsContainer> operationResult = session
                 .dataDiscoveryService()

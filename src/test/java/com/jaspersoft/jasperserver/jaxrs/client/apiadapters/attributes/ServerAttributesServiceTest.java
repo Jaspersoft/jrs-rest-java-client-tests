@@ -14,6 +14,9 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import javax.ws.rs.core.Response;
+import java.util.List;
+
 import static java.util.Arrays.asList;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.testng.Assert.assertEquals;
@@ -92,6 +95,26 @@ public class ServerAttributesServiceTest extends RestClientTestUtil {
         assertEquals(operationResult.getResponse().getStatus(), Response.Status.CREATED.getStatusCode());
         assertEquals(new Integer(1), entity.getEmbedded().getRepositoryPermissions().get(0).getMask());
     }
+
+    @Test
+    public void test_createSingleAttributeWithCurlyBraceName() {
+        // Given
+        HypermediaAttribute attribute = new HypermediaAttribute();
+        attribute.setName("}").setValue("value");
+        // When
+        OperationResult<HypermediaAttribute> operationResult = session
+                .attributesService()
+                .attribute("}")
+                .createOrUpdate(attribute);
+
+        HypermediaAttribute entity = operationResult.getEntity();
+        // Then
+        assertEquals(operationResult.getResponse().getStatus(), Response.Status.CREATED.getStatusCode());
+        assertNotNull(entity);
+        assertEquals(operationResult.getEntity().getName(), attribute.getName());
+        assertEquals(operationResult.getEntity().getValue(), attribute.getValue());
+    }
+
 
     @Test(dependsOnMethods = "should_create_single_attribute_with_permissions")
     public void should_create_attributes_with_permissions() {

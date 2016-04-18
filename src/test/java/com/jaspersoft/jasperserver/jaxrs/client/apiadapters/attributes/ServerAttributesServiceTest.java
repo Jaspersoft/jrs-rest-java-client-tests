@@ -7,6 +7,7 @@ import com.jaspersoft.jasperserver.dto.permissions.RepositoryPermission;
 import com.jaspersoft.jasperserver.jaxrs.client.RestClientTestUtil;
 import com.jaspersoft.jasperserver.jaxrs.client.core.operationresult.NullEntityOperationResult;
 import com.jaspersoft.jasperserver.jaxrs.client.core.operationresult.OperationResult;
+import java.util.LinkedList;
 import java.util.List;
 import javax.ws.rs.core.Response;
 import org.testng.annotations.AfterClass;
@@ -293,6 +294,35 @@ public class ServerAttributesServiceTest extends RestClientTestUtil {
             // Then
             assertNotNull(attributes);
             assertEquals(Response.Status.OK.getStatusCode(), operationResult.getResponse().getStatus());
+        }
+
+
+    @Test
+    public void should_get_serialized_content() {
+            // When
+        configuration.setHandleErrors(false);
+        HypermediaAttribute attribute = (HypermediaAttribute) new HypermediaAttribute().
+                setName("administerAttribute").
+                setValue(null).
+                setDescription("Administer Attribute description").
+                setPermissionMask(1).
+                setSecure(false).
+                setInherited(false).
+        setHolder("tenant:/");
+
+        LinkedList<RepositoryPermission> repositoryPermissions = new LinkedList<RepositoryPermission>();
+        repositoryPermissions.add(new RepositoryPermission().setRecipient("role:/ROLE_ADMINISTRATOR").setMask(1));
+        attribute.setEmbedded(new HypermediaAttributeEmbeddedContainer().setRepositoryPermissions(repositoryPermissions));
+
+            OperationResult<HypermediaAttribute> operationResult = session
+                    .attributesService()
+                    .attribute(attribute.getName())
+                    .setIncludePermissions(true)
+                    .createOrUpdate(attribute);
+
+        String massage  = operationResult.getSerializedContent();
+            // Then
+        assertNotNull(massage);
         }
 
     @AfterClass

@@ -1,6 +1,6 @@
 package com.jaspersoft.jasperserver.jaxrs.client.apiadapters.datadiscovery;
 
-import com.jaspersoft.jasperserver.dto.resources.domain.ClientDomain;
+import com.jaspersoft.jasperserver.dto.resources.ClientSemanticLayerDataSource;
 import com.jaspersoft.jasperserver.dto.resources.domain.DataIslandsContainer;
 import com.jaspersoft.jasperserver.jaxrs.client.RestClientTestUtil;
 import com.jaspersoft.jasperserver.jaxrs.client.core.operationresult.OperationResult;
@@ -22,13 +22,13 @@ import static org.testng.Assert.assertNotNull;
  */
 public class DomainContextTest extends RestClientTestUtil {
     private String uuId;
-    private ClientDomain domainContext;
+    private ClientSemanticLayerDataSource domainContext;
 
     @BeforeClass
     public void before() {
         initClient();
         initSession();
-        domainContext = new ClientDomain().setUri("/organizations/organization_1/Domains/Simple_Domain");
+        domainContext = new ClientSemanticLayerDataSource().setUri("/public/Samples/Domains/supermartDomain");
     }
 
     @AfterClass
@@ -39,7 +39,7 @@ public class DomainContextTest extends RestClientTestUtil {
     @Test
     public void should_create_context() {
 
-        OperationResult<ClientDomain> operationResult = session
+        OperationResult<ClientSemanticLayerDataSource> operationResult = session
                 .dataDiscoveryService()
                 .domainContext()
                 .create(domainContext);

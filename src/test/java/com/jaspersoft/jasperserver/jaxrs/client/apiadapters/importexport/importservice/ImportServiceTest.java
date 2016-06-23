@@ -69,7 +69,7 @@ public class ImportServiceTest extends RestClientTestUtil {
     }
 
 
-    @Test
+    @Test(enabled = false)
     public void should_restart_import_task() throws InterruptedException {
         ImportService importService = session
                 .importService();

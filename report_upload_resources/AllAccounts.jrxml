@@ -41,7 +41,7 @@
 					<property name="local_mesure_unity" value="pixel"/>
 				</reportElement>
 				<imageExpression><![CDATA["repo:Jaspersoft_logo.png"]]></imageExpression>
-				<hyperlinkTooltipExpression><![CDATA["JasperReports Logo"]]></hyperlinkTooltipExpression>
+				<hyperlinkTooltipExpression><![CDATA["Jaspersoft_logo.png"]]></hyperlinkTooltipExpression>
 			</image>
 			<line>
 				<reportElement x="0" y="27" width="515" height="1" forecolor="#000000"/>
@@ -76,15 +76,11 @@
 	</pageFooter>
 	<summary>
 		<band height="149" splitType="Stretch">
-			<image scaleImage="Clip" hAlign="Right" vAlign="Middle" onErrorType="Icon">
-				<reportElement positionType="Float" x="0" y="71" width="250" height="70"/>
-				<imageExpression><![CDATA["repo:LogoLink"]]></imageExpression>
-				<hyperlinkTooltipExpression><![CDATA["JasperReports Logo"]]></hyperlinkTooltipExpression>
-			</image>
+
 			<image scaleImage="Clip" hAlign="Right" vAlign="Middle" onErrorType="Icon">
 				<reportElement positionType="Float" x="265" y="71" width="250" height="70"/>
-				<imageExpression><![CDATA["repo:AllAccounts_Res2"]]></imageExpression>
-				<hyperlinkTooltipExpression><![CDATA["Jaspersoft Logo"]]></hyperlinkTooltipExpression>
+				<imageExpression><![CDATA["repo:JRLogo"]]></imageExpression>
+				<hyperlinkTooltipExpression><![CDATA["JR logo"]]></hyperlinkTooltipExpression>
 			</image>
 			<componentElement>
 				<reportElement key="table" x="0" y="0" width="515" height="70"/>

@@ -43,6 +43,7 @@ import static org.testng.Assert.assertTrue;
  * @author Yaroslav.Kovalchyk
  * @version $Id$
  */
+
 public class MultiThreadingInputControlsServiceTest extends RestClientTestUtil {
 
     private static final int threadsCount = 100;
@@ -79,22 +80,22 @@ public class MultiThreadingInputControlsServiceTest extends RestClientTestUtil {
 
     }
 
-    @Test
+    @Test(enabled = false)
     public void multiThreading_superuser_sameSession() throws InterruptedException {
         multiThreading(threadsCount, "/organizations/organization_1/adhoc/topics/Cascading_multi_select_topic", "superuser", "superuser", true);
     }
 
-    @Test
+    @Test(enabled = false)
     public void multiThreading_jasperadmin_sameSession() throws InterruptedException {
         multiThreading(threadsCount, "/adhoc/topics/Cascading_multi_select_topic", "jasperadmin|organization_1", "jasperadmin", true);
     }
 
-    @Test
+    @Test(enabled = false)
     public void multiThreading_superuser_differentSession() throws InterruptedException {
         multiThreading(threadsCount, "/organizations/organization_1/adhoc/topics/Cascading_multi_select_topic", "superuser", "superuser", false);
     }
 
-    @Test
+    @Test(enabled = false)
     public void multiThreading_jasperadmin_differentSession() throws InterruptedException {
         multiThreading(threadsCount, "/adhoc/topics/Cascading_multi_select_topic", "jasperadmin|organization_1", "jasperadmin", false);
     }

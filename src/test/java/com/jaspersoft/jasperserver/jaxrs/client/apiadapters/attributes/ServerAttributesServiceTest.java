@@ -7,11 +7,15 @@ import com.jaspersoft.jasperserver.dto.permissions.RepositoryPermission;
 import com.jaspersoft.jasperserver.jaxrs.client.RestClientTestUtil;
 import com.jaspersoft.jasperserver.jaxrs.client.core.operationresult.NullEntityOperationResult;
 import com.jaspersoft.jasperserver.jaxrs.client.core.operationresult.OperationResult;
+import java.util.LinkedList;
 import java.util.List;
 import javax.ws.rs.core.Response;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
+
+import javax.ws.rs.core.Response;
+import java.util.List;
 
 import static java.util.Arrays.asList;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
@@ -91,6 +95,26 @@ public class ServerAttributesServiceTest extends RestClientTestUtil {
         assertEquals(operationResult.getResponse().getStatus(), Response.Status.CREATED.getStatusCode());
         assertEquals(new Integer(1), entity.getEmbedded().getRepositoryPermissions().get(0).getMask());
     }
+
+    @Test
+    public void test_createSingleAttributeWithCurlyBraceName() {
+        // Given
+        HypermediaAttribute attribute = new HypermediaAttribute();
+        attribute.setName("}").setValue("value");
+        // When
+        OperationResult<HypermediaAttribute> operationResult = session
+                .attributesService()
+                .attribute("}")
+                .createOrUpdate(attribute);
+
+        HypermediaAttribute entity = operationResult.getEntity();
+        // Then
+        assertEquals(operationResult.getResponse().getStatus(), Response.Status.CREATED.getStatusCode());
+        assertNotNull(entity);
+        assertEquals(operationResult.getEntity().getName(), attribute.getName());
+        assertEquals(operationResult.getEntity().getValue(), attribute.getValue());
+    }
+
 
     @Test(dependsOnMethods = "should_create_single_attribute_with_permissions")
     public void should_create_attributes_with_permissions() {
@@ -293,6 +317,35 @@ public class ServerAttributesServiceTest extends RestClientTestUtil {
             // Then
             assertNotNull(attributes);
             assertEquals(Response.Status.OK.getStatusCode(), operationResult.getResponse().getStatus());
+        }
+
+
+    @Test
+    public void should_get_serialized_content() {
+            // When
+        configuration.setHandleErrors(false);
+        HypermediaAttribute attribute = (HypermediaAttribute) new HypermediaAttribute().
+                setName("administerAttribute").
+                setValue(null).
+                setDescription("Administer Attribute description").
+                setPermissionMask(1).
+                setSecure(false).
+                setInherited(false).
+        setHolder("tenant:/");
+
+        LinkedList<RepositoryPermission> repositoryPermissions = new LinkedList<RepositoryPermission>();
+        repositoryPermissions.add(new RepositoryPermission().setRecipient("role:/ROLE_ADMINISTRATOR").setMask(1));
+        attribute.setEmbedded(new HypermediaAttributeEmbeddedContainer().setRepositoryPermissions(repositoryPermissions));
+
+            OperationResult<HypermediaAttribute> operationResult = session
+                    .attributesService()
+                    .attribute(attribute.getName())
+                    .setIncludePermissions(true)
+                    .createOrUpdate(attribute);
+
+        String massage  = operationResult.getSerializedContent();
+            // Then
+        assertNotNull(massage);
         }
 
     @AfterClass

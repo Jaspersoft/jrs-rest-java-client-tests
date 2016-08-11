@@ -1,7 +1,7 @@
 package com.jaspersoft.jasperserver.jaxrs.client.apiadapters.domain;
 
 import com.jaspersoft.jasperserver.dto.resources.ClientFile;
-import com.jaspersoft.jasperserver.dto.resources.domain.ClientSchema;
+import com.jaspersoft.jasperserver.dto.resources.domain.Schema;
 import com.jaspersoft.jasperserver.jaxrs.client.RestClientTestUtil;
 import com.jaspersoft.jasperserver.jaxrs.client.core.enums.MimeType;
 import org.testng.annotations.AfterClass;
@@ -43,7 +43,7 @@ public class DomainSchemaServiceTest extends RestClientTestUtil {
     @Test
     public void should_get_domain_schema() {
         session.getStorage().getConfiguration().setAcceptMimeType(MimeType.JSON);
-        ClientSchema schema = session
+        Schema schema = session
                 .domainService()
                 .forDomain(SCHEMA_URI)
                 .schema()
@@ -56,31 +56,27 @@ public class DomainSchemaServiceTest extends RestClientTestUtil {
     public void should_put_domain_schema_and_get() {
 
         session.getStorage().getConfiguration().setAcceptMimeType(MimeType.JSON);
-        ClientSchema schema = session
+        Schema schema = session
                 .domainService()
                 .forDomain(SIMPLE_SCHEMA_URI)
                 .schema()
                 .get()
                 .getEntity();
 
-        ClientSchema schemaAfterPut = session
+        Schema schemaAfterPut = session
                 .domainService()
                 .forDomain(SIMPLE_SCHEMA_URI)
                 .schema()
                 .update(schema)
                 .getEntity();
 
-        ClientSchema resultSchema = session
+        Schema resultSchema = session
                 .domainService()
                 .forDomain(SIMPLE_SCHEMA_URI)
                 .schema()
                 .get()
                 .getEntity();
 
-        resultSchema.setVersion(0);
-        resultSchema.setUpdateDate(null);
-        schema.setVersion(0);
-        schema.setUpdateDate(null);
 
         assertNotNull(schema);
         assertNotNull(schemaAfterPut);

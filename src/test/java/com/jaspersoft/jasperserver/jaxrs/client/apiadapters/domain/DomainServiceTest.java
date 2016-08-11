@@ -11,7 +11,7 @@ import com.jaspersoft.jasperserver.jaxrs.client.apiadapters.importexport.imports
 import com.jaspersoft.jasperserver.jaxrs.client.apiadapters.resources.ResourceSearchParameter;
 import com.jaspersoft.jasperserver.jaxrs.client.core.exceptions.JSClientWebException;
 import com.jaspersoft.jasperserver.jaxrs.client.core.operationresult.OperationResult;
-import com.jaspersoft.jasperserver.jaxrs.client.dto.importexport.StateDto;
+import com.jaspersoft.jasperserver.dto.importexport.State;
 import java.io.File;
 import java.net.URISyntaxException;
 import java.util.HashMap;
@@ -191,29 +191,31 @@ public class DomainServiceTest extends RestClientTestUtil {
         File folder = new File(folderName);
         File[] listOfResources = folder.listFiles();
         if (listOfResources.length > 0) {
-            TEST_LOGGER.debug("For upload were founded " + listOfResources.length + "resources");
-        } else {
-            TEST_LOGGER.debug("Resources were not founded");
-            return;
-        }
-        if (listOfResources.length > 0) {
-            for (File resource : listOfResources) {
-                OperationResult<StateDto> operationResult = session
-                        .importService()
-                        .newTask()
-                        .parameter(ImportParameter.INCLUDE_ACCESS_EVENTS, true)
-                        .create(resource);
-
-                StateDto stateDto = operationResult.getEntity();
-
-                while (stateDto.getPhase().equals(INPROGRESS_STATUS)) {
-                    stateDto = session
+            if (listOfResources.length > 0) {
+                TEST_LOGGER.debug("For upload were founded " + listOfResources.length + "resources");
+            } else {
+                TEST_LOGGER.debug("Resources were not founded");
+                return;
+            }
+            if (listOfResources.length > 0) {
+                for (File resource : listOfResources) {
+                    OperationResult<State> operationResult = session
                             .importService()
-                            .task(stateDto.getId())
-                            .state().getEntity();
-                    Thread.sleep(100);
+                            .newTask()
+                            .parameter(ImportParameter.INCLUDE_ACCESS_EVENTS, true)
+                            .create(resource);
+
+                    State stateDto = operationResult.getEntity();
+
+                    while (stateDto.getPhase().equals(INPROGRESS_STATUS)) {
+                        stateDto = session
+                                .importService()
+                                .task(stateDto.getId())
+                                .state().getEntity();
+                        Thread.sleep(100);
+                    }
+                    TEST_LOGGER.debug(resource.getName() + " was uploaded successfully");
                 }
-                TEST_LOGGER.debug(resource.getName() + " was uploaded successfully");
             }
         }
     }

@@ -147,7 +147,6 @@ public class ResourcesServiceTest extends RestClientTestUtil {
                 setJndiName("jdbc/sugarcrm"));
         repunit.setLabel("All accounts test report unit");
 
-
         ClientFile clifile = new ClientFile();
         clifile.setType(ClientFile.FileType.jrxml);
         clifile.setLabel("AllAccounts");
@@ -188,6 +187,7 @@ public class ResourcesServiceTest extends RestClientTestUtil {
                         .resource(repunit)
                         .withJrxml(new FileInputStream("report_upload_resources\\AllAccounts.jrxml"), clifile)
                         .withNewFileReference("Jaspersoft_logo.png", new ClientReference().setUri("/public/Samples/Resources/Images/Jaspersoft_logo.png"))
+                        .withNewFileReference("JRLogo", new ClientReference().setUri("/organizations/organization_1/images/JRLogo"))
                         .createInFolder("/temp");
         assertNotNull(repUnut);
     }

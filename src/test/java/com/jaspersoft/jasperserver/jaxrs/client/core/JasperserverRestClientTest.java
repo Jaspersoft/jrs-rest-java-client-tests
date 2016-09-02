@@ -1,14 +1,15 @@
 package com.jaspersoft.jasperserver.jaxrs.client.core;
 
 
-import com.jaspersoft.jasperserver.dto.serverinfo.ServerInfo;
 import com.jaspersoft.jasperserver.jaxrs.client.RestClientTestUtil;
 import com.jaspersoft.jasperserver.jaxrs.client.core.enums.AuthenticationType;
 import com.jaspersoft.jasperserver.jaxrs.client.core.exceptions.AuthenticationFailedException;
 import com.jaspersoft.jasperserver.jaxrs.client.core.exceptions.JSClientWebException;
 import java.util.TimeZone;
 import javax.ws.rs.ProcessingException;
+import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -72,15 +73,28 @@ public class JasperserverRestClientTest extends RestClientTestUtil {
     }
 
     @Test
-    public void should_send_json_as_string() {
+    public void should_send_request_via_client() {
         configuration.setAuthenticationType(AuthenticationType.SPRING);
         session = client.authenticate("jasperadmin", "jasperadmin");
-        ServerInfo response = session.
+        Response response = session.
                 configuredClient().
                 path("rest_v2/serverInfo").
                 request().
                 accept(MediaType.APPLICATION_JSON_TYPE).
-                method("GET", ServerInfo.class);
+                method("GET");
+        System.out.println(response);
+    }
+
+    @Test
+    public void should_send_json_as_string() {
+        configuration.setAuthenticationType(AuthenticationType.SPRING);
+        session = client.authenticate("jasperadmin", "jasperadmin");
+        Response response = session.
+                configuredClient().
+                path("rest_v2/").
+                request().
+                accept(MediaType.APPLICATION_JSON_TYPE).
+                method("PUT", Entity.text("some entity"));
         System.out.println(response);
     }
 

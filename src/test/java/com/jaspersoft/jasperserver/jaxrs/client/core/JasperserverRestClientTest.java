@@ -1,12 +1,14 @@
 package com.jaspersoft.jasperserver.jaxrs.client.core;
 
 
+import com.jaspersoft.jasperserver.dto.serverinfo.ServerInfo;
 import com.jaspersoft.jasperserver.jaxrs.client.RestClientTestUtil;
 import com.jaspersoft.jasperserver.jaxrs.client.core.enums.AuthenticationType;
 import com.jaspersoft.jasperserver.jaxrs.client.core.exceptions.AuthenticationFailedException;
 import com.jaspersoft.jasperserver.jaxrs.client.core.exceptions.JSClientWebException;
 import java.util.TimeZone;
 import javax.ws.rs.ProcessingException;
+import javax.ws.rs.core.MediaType;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -43,19 +45,19 @@ public class JasperserverRestClientTest extends RestClientTestUtil {
         assertEquals(USER_TIME_ZONE, session.getStorage().getUserTimeZone().getID());
     }
 
-    @Test (expectedExceptions = AuthenticationFailedException.class)
+    @Test(expectedExceptions = AuthenticationFailedException.class)
     public void should_not_return_session_id_with_wrong_credentials_via_j_sucurity_check() {
         session = client.authenticate(USER_NAME, PASSWORD_WRONG);
     }
 
-    @Test (expectedExceptions = ProcessingException.class)
+    @Test(expectedExceptions = ProcessingException.class)
     public void should_throw_exception_with_wrong_uri() {
         configuration.setJasperReportsServerUrl("http://wrongURI");
         session = client.authenticate(USER_NAME, PASSWORD);
 
     }
 
-    @Test (expectedExceptions = JSClientWebException.class)
+    @Test(expectedExceptions = JSClientWebException.class)
     public void should_throw_exception_with_wrong_server_uri() {
         configuration.setJasperReportsServerUrl("http://localhost");
         session = client.authenticate(USER_NAME, PASSWORD);
@@ -69,8 +71,21 @@ public class JasperserverRestClientTest extends RestClientTestUtil {
         assertNotNull(session);
     }
 
+    @Test
+    public void should_send_json_as_string() {
+        configuration.setAuthenticationType(AuthenticationType.SPRING);
+        session = client.authenticate("jasperadmin", "jasperadmin");
+        ServerInfo response = session.
+                configuredClient().
+                path("rest_v2/serverInfo").
+                request().
+                accept(MediaType.APPLICATION_JSON_TYPE).
+                method("GET", ServerInfo.class);
+        System.out.println(response);
+    }
+
     @AfterMethod
-    public  void  after() {
+    public void after() {
         if (session != null)
             session.logout();
     }

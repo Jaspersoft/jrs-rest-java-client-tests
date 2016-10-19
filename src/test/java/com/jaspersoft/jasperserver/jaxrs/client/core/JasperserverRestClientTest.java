@@ -75,6 +75,19 @@ public class JasperserverRestClientTest extends RestClientTestUtil {
     @Test
     public void should_send_request_via_client() {
         configuration.setAuthenticationType(AuthenticationType.SPRING);
+        session = client.authenticate("superuser", "superuser");
+        Response response = session.
+                configuredClient().
+                path("rest_v2/users").
+                request().
+                accept(MediaType.APPLICATION_JSON_TYPE).
+                method("GET");
+        System.out.println(response);
+    }
+
+    @Test
+    public void should_send_request_to_thumbnails_via_client() {
+        configuration.setAuthenticationType(AuthenticationType.SPRING);
         session = client.authenticate("jasperadmin", "jasperadmin");
         Response response = session.
                 configuredClient().
@@ -94,7 +107,8 @@ public class JasperserverRestClientTest extends RestClientTestUtil {
                 path("rest_v2/").
                 request().
                 accept(MediaType.APPLICATION_JSON_TYPE).
-                method("PUT", Entity.text("some entity"));
+                header("Content-Type", "contentType").
+        method("PUT", Entity.text("some entity"));
         System.out.println(response);
     }
 

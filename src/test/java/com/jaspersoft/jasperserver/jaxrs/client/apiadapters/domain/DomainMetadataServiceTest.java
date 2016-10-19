@@ -14,6 +14,8 @@ import static org.testng.Assert.assertTrue;
  */
 public class DomainMetadataServiceTest extends RestClientTestUtil{
 
+    public static final String DOMAIN_URI = "/organizations/organization_1/Domains/Simple_Domain";
+
     @BeforeClass
     public void before() {
         initClient();
@@ -24,7 +26,8 @@ public class DomainMetadataServiceTest extends RestClientTestUtil{
     public void should_return_domain_metadata() {
 
         DomainMetaData domainMetaData = session.domainService()
-                .domainMetadata("/organizations/organization_1/Domains/Simple_Domain")
+                .forDomain(DOMAIN_URI)
+                .metadata()
                 .retrieve()
                 .getEntity();
         assertNotNull(domainMetaData);
@@ -33,6 +36,6 @@ public class DomainMetadataServiceTest extends RestClientTestUtil{
 
     @AfterClass
     public  void after() {
-     session.logout();
+        session.logout();
     }
 }

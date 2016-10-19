@@ -116,8 +116,6 @@ public class ResourcesServiceTest extends RestClientTestUtil {
         Assert.assertNotNull(clientResource);
         Assert.assertNotNull(clientResource.getCreationDate());
     }
-
-
     @Test
     public void should_return_resource() throws InterruptedException {
 

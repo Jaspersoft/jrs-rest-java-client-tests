@@ -1,7 +1,7 @@
 package com.jaspersoft.jasperserver.jaxrs.client.apiadapters.connections;
 
-import com.jaspersoft.jasperserver.dto.resources.ClientSemanticLayerDataSource;
-import com.jaspersoft.jasperserver.dto.resources.ResourceMediaType;
+import com.jaspersoft.jasperserver.dto.resources.domain.ClientDomain;
+import com.jaspersoft.jasperserver.dto.resources.domain.PresentationGroupElement;
 import com.jaspersoft.jasperserver.jaxrs.client.RestClientTestUtil;
 import com.jaspersoft.jasperserver.jaxrs.client.core.operationresult.OperationResult;
 import javax.ws.rs.core.Response;
@@ -22,13 +22,15 @@ import static org.testng.Assert.assertEquals;
 public class DomainConnectionsServiceTest extends RestClientTestUtil {
 
     private String uuId;
-    private ClientSemanticLayerDataSource connection;
+    private ClientDomain connection;
+    private String connectionMimeType = "application/repository.semanticLayerDataSource";
+    private String metadataMimeType = "application/repository.semanticLayerDataSource.metadata";
 
     @BeforeClass
     public void before() {
         initClient();
         initSession();
-        connection = new ClientSemanticLayerDataSource().setUri("/organizations/organization_1/Domains/Simple_Domain");
+        connection = new ClientDomain().setUri("/organizations/organization_1/Domains/Simple_Domain");
     }
 
     @AfterClass
@@ -39,9 +41,9 @@ public class DomainConnectionsServiceTest extends RestClientTestUtil {
     @Test
     public void should_create_connection() {
 
-        OperationResult<ClientSemanticLayerDataSource> operationResult = session
+        OperationResult<ClientDomain> operationResult = session
                 .connectionsService()
-                .connection(ClientSemanticLayerDataSource.class, ResourceMediaType.SEMANTIC_LAYER_DATA_SOURCE_JSON)
+                .connection(ClientDomain.class, connectionMimeType)
                 .create(connection);
 
         assertEquals(Response.Status.CREATED.getStatusCode(), operationResult.getResponse().getStatus());
@@ -52,9 +54,9 @@ public class DomainConnectionsServiceTest extends RestClientTestUtil {
 
     @Test(dependsOnMethods = "should_create_connection")
     public void should_update_connection() {
-        OperationResult<ClientSemanticLayerDataSource> operationResult = session
+        OperationResult<ClientDomain> operationResult = session
                 .connectionsService()
-                .connection(ClientSemanticLayerDataSource.class, ResourceMediaType.SEMANTIC_LAYER_DATA_SOURCE_JSON, uuId)
+                .connection(ClientDomain.class, connectionMimeType, uuId)
                 .update(connection.setDescription("Test connection"));
 
         assertEquals(Response.Status.OK.getStatusCode(), operationResult.getResponse().getStatus());
@@ -62,9 +64,9 @@ public class DomainConnectionsServiceTest extends RestClientTestUtil {
 
     @Test(dependsOnMethods = "should_update_connection")
     public void should_get_connection() {
-        OperationResult<ClientSemanticLayerDataSource> operationResult = session
+        OperationResult<ClientDomain> operationResult = session
                 .connectionsService()
-                .connection(ClientSemanticLayerDataSource.class, ResourceMediaType.SEMANTIC_LAYER_DATA_SOURCE_JSON, uuId)
+                .connection(ClientDomain.class, connectionMimeType, uuId)
                 .get();
 
         assertEquals(Response.Status.OK.getStatusCode(), operationResult.getResponse().getStatus());
@@ -78,4 +80,20 @@ public class DomainConnectionsServiceTest extends RestClientTestUtil {
                 .delete();
         assertEquals(Response.Status.NO_CONTENT.getStatusCode(), operationResult.getResponse().getStatus());
     }
+
+    @Test
+    public void should_create_connection_get_metadata() {
+        OperationResult<PresentationGroupElement> operationResult = session
+                .connectionsService()
+                .connection(ClientDomain.class,
+                        connectionMimeType,
+                        PresentationGroupElement.class,
+                        metadataMimeType)
+                .createAndGetMetadata(connection);
+
+        assertEquals(Response.Status.OK.getStatusCode(), operationResult.getResponse().getStatus());
+
+    }
+
+
 }

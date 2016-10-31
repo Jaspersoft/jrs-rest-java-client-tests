@@ -11,8 +11,13 @@ import com.jaspersoft.jasperserver.dto.resources.ClientResourceListWrapper;
 import com.jaspersoft.jasperserver.jaxrs.client.RestClientTestUtil;
 import com.jaspersoft.jasperserver.jaxrs.client.core.operationresult.OperationResult;
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import javax.ws.rs.core.Response;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
@@ -73,6 +78,38 @@ public class ResourcesServiceTest extends RestClientTestUtil {
         assertTrue(resourceListWrapper.getResourceLookups().size() <= 5);
     }
 
+    @Test
+    public void should_upload_resource_as_binaryData() throws IOException {
+
+        byte[] encoded = Files.readAllBytes(Paths.get("D:\\workspaceIdea\\jrs-rest-java-client-tests\\image1.jpeg"));
+        String content = new String(encoded, StandardCharsets.UTF_8);
+
+        ClientFile file = new ClientFile();
+        file.
+                setUri("/public").
+                setType(ClientFile.FileType.img).
+                setLabel("testFile").
+                setDescription("testDescription").
+                setContent(content);
+
+        OperationResult<ClientResource> result = session
+                .resourcesService()
+                .resource("/public")
+                .createNew(file);
+
+        assertNotNull(result);
+    }
+
+    @Test
+    public void should_upload_resource_as_multipart() throws FileNotFoundException {
+
+        OperationResult<ClientFile> result = session
+                .resourcesService()
+                .resource("/public")
+                .uploadFile(new File("D:\\workspaceIdea\\jrs-rest-java-client-tests\\image1.jpeg"), ClientFile.FileType.img, "fileName", "fileDescription");
+
+        assertNotNull(result);
+    }
 
     @Test
     public void should_delete_folder() throws InterruptedException {
@@ -157,6 +194,8 @@ public class ResourcesServiceTest extends RestClientTestUtil {
 
         assertNotNull(repUnut);
     }
+
+
 
     @Test
     public void should_upload_report_with_jrxml_with_image() throws FileNotFoundException {

@@ -6,7 +6,7 @@
 
     <groupId>com.jaspersoft</groupId>
     <artifactId>jrs-rest-java-client-tests</artifactId>
-    <version>6.2.5</version>
+    <version>6.3.3-SNAPSHOT</version>
     <name>Integration tests for JasperReports server REST client</name>
 
     <properties>
@@ -63,7 +63,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-antrun-plugin</artifactId>
-                <version>1.6</version>
+                <version>1.7</version>
                 <executions>
                     <execution>
                         <phase>validate</phase>

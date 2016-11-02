@@ -67,6 +67,27 @@ public class ReportingServiceTest extends RestClientTestUtil {
         InputStream entity = result.getEntity();
         // Then
         assertNotNull(entity);
+
+        RestClientTestUtil.streamToFile(entity, "report.pdf");
+    }
+
+    @Test
+    public void should_return_proper_entity_for_LA_timezone_de_locale() {
+
+        // When
+        OperationResult<InputStream> result = session
+                .reportingService()
+                .report("/public/Samples/Reports/12g.PromotionDetailsReport")
+                .prepareForRun(ReportOutputFormat.PDF, 1)
+                .forTimeZone(TimeZone.getTimeZone("America/Los_Angeles"))
+                .parameter("userLocale", "de")
+                .run();
+
+        InputStream entity = result.getEntity();
+        // Then
+        assertNotNull(entity);
+
+        RestClientTestUtil.streamToFile(entity, "report.pdf");
     }
 
     @Test

@@ -79,75 +79,79 @@ public class JdbcConnectionsServiceTest extends RestClientTestUtil {
         assertNotNull(operationResult);
         assertEquals(Response.Status.OK.getStatusCode(), operationResult.getResponse().getStatus());
     }
-//
-//    @Test(dependsOnMethods = "should_get_connection")
-//    public void should_get_metadata() {
-//        OperationResult<ResourceGroupElement> operationResult = session
-//                .connectionsService()
-//                .connection(uuId, ResourceGroupElement.class,
-//                        ConnectionMediaType.JDBC_DATA_SOURCE_METADATA_TYPE)
-//                .metadata();
-//
-//        assertNotNull(operationResult);
-//        assertEquals(Response.Status.OK.getStatusCode(), operationResult.getResponse().getStatus());
-//    }
-//
-//    @Test(dependsOnMethods = "should_get_metadata")
-//    public void should_delete_connection() {
-//        OperationResult operationResult = session
-//                .connectionsService()
-//                .connection(uuId)
-//                .delete();
-//
-//        assertNotNull(operationResult);
-//        assertEquals(Response.Status.NO_CONTENT.getStatusCode(), operationResult.getResponse().getStatus());
-//    }
-//
-//    @Test(dependsOnMethods = "should_delete_connection")
-//    public void should_create_connection_and_get_metadata() {
-//        OperationResult<ResourceGroupElement> operationResult = session
-//                .connectionsService()
-//                .connection(ClientJdbcDataSource.class,
-//                        ConnectionMediaType.JDBC_DATA_SOURCE_TYPE,
-//                        ResourceGroupElement.class,
-//                        ConnectionMediaType.JDBC_DATA_SOURCE_METADATA_TYPE)
-//                .createAndGetMetadata(connection);
-//
-//        assertNotNull(operationResult);
-//        extractUuid(operationResult.getResponse().getHeaderString("Location"));
-//        assertEquals(Response.Status.OK.getStatusCode(), operationResult.getResponse().getStatus());
-//    }
-//
-//    @SuppressWarnings("unchecked")
-//    @Test(dependsOnMethods = "should_create_connection_and_get_metadata")
-//    public void should_execute_query() {
-//        OperationResult<Map> operationResult = session
-//                .connectionsService()
-//                .connection(uuId)
-//                .query("select * from account", Map.class)
-//                .execute();
-//
-//        Map result = operationResult.getEntity();
-//
-//        assertNotNull(operationResult);
-//        assertNotNull(result);
-//        assertEquals(Response.Status.OK.getStatusCode(), operationResult.getResponse().getStatus());
-//    }
-//
-//    @SuppressWarnings("unchecked")
-//    @Test(dependsOnMethods = "should_execute_query")
-//    public void should_return_query_metadata() {
-//        OperationResult<Map> operationResult = session
-//                .connectionsService()
-//                .connection(uuId)
-//                .query("select * from account", Map.class)
-//                .resultSetMetadata();
-//        Map result = operationResult.getEntity();
-//
-//        assertNotNull(operationResult);
-//        assertNotNull(result);
-//        assertEquals(Response.Status.OK.getStatusCode(), operationResult.getResponse().getStatus());
-//    }
+
+    @Test(dependsOnMethods = "should_get_connection")
+    public void should_get_metadata() {
+        OperationResult<ResourceGroupElement> operationResult = session
+                .connectionsService()
+                .connection(ClientJdbcDataSource.class,
+                        ConnectionMediaType.JDBC_DATA_SOURCE_TYPE,
+                        ResourceGroupElement.class,
+                        ConnectionMediaType.JDBC_DATA_SOURCE_METADATA_TYPE,
+                        uuId)
+                .metadata();
+
+        assertNotNull(operationResult);
+        assertEquals(Response.Status.OK.getStatusCode(), operationResult.getResponse().getStatus());
+    }
+
+    @Test(dependsOnMethods = "should_get_metadata")
+    public void should_delete_connection() {
+        OperationResult operationResult = session
+                .connectionsService()
+                .connection(uuId)
+                .delete();
+
+        assertNotNull(operationResult);
+        assertEquals(Response.Status.NO_CONTENT.getStatusCode(), operationResult.getResponse().getStatus());
+    }
+
+    @Test(dependsOnMethods = "should_delete_connection")
+    public void should_create_connection_and_get_metadata() {
+        OperationResult<ResourceGroupElement> operationResult = session
+                .connectionsService()
+                .connection(ClientJdbcDataSource.class,
+                        ConnectionMediaType.JDBC_DATA_SOURCE_TYPE,
+                        ResourceGroupElement.class,
+                        ConnectionMediaType.JDBC_DATA_SOURCE_METADATA_TYPE,
+                        uuId)
+                .createAndGetMetadata(connection);
+
+        assertNotNull(operationResult);
+        extractUuid(operationResult.getResponse().getHeaderString("Location"));
+        assertEquals(Response.Status.OK.getStatusCode(), operationResult.getResponse().getStatus());
+    }
+
+    @SuppressWarnings("unchecked")
+    @Test(dependsOnMethods = "should_create_connection_and_get_metadata")
+    public void should_execute_query() {
+        OperationResult<Map> operationResult = session
+                .connectionsService()
+                .connection(uuId)
+                .query("select * from account", Map.class)
+                .execute();
+
+        Map result = operationResult.getEntity();
+
+        assertNotNull(operationResult);
+        assertNotNull(result);
+        assertEquals(Response.Status.OK.getStatusCode(), operationResult.getResponse().getStatus());
+    }
+
+    @SuppressWarnings("unchecked")
+    @Test(dependsOnMethods = "should_execute_query")
+    public void should_return_query_metadata() {
+        OperationResult<Map> operationResult = session
+                .connectionsService()
+                .connection(uuId)
+                .query("select * from account", Map.class)
+                .resultSetMetadata();
+        Map result = operationResult.getEntity();
+
+        assertNotNull(operationResult);
+        assertNotNull(result);
+        assertEquals(Response.Status.OK.getStatusCode(), operationResult.getResponse().getStatus());
+    }
 
     private void extractUuid(String locationHeader) {
         if (locationHeader.endsWith("metadata")) {
@@ -157,4 +161,3 @@ public class JdbcConnectionsServiceTest extends RestClientTestUtil {
         uuId = locationHeader.substring(locationHeader.lastIndexOf("/") + 1);
     }
 }
-

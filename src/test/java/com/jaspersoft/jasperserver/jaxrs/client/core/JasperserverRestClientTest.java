@@ -58,7 +58,7 @@ public class JasperserverRestClientTest extends RestClientTestUtil {
 
     }
 
-    @Test(expectedExceptions = JSClientWebException.class)
+    @Test (expectedExceptions = JSClientWebException.class)
     public void should_throw_exception_with_wrong_server_uri() {
         configuration.setJasperReportsServerUrl("http://localhost");
         session = client.authenticate(USER_NAME, PASSWORD);

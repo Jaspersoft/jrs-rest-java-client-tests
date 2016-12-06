@@ -46,7 +46,8 @@ public class ThumbnailsServiceTest extends RestClientTestUtil {
         assertTrue(entity.size() == 2);
         assertFalse(entity.get(0).getThumbnailData().isEmpty());
         assertFalse(entity.get(1).getThumbnailData().isEmpty());
-    }    @Test
+    }
+    @Test
     public void should_return_list_of_thumbnails_with_default_request_method_with_default_picture() {
         // When
         List<ResourceThumbnail> entity = session.thumbnailsService()

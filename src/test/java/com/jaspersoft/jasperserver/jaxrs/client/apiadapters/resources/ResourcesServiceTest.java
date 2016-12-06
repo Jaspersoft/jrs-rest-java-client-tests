@@ -8,6 +8,7 @@ import com.jaspersoft.jasperserver.dto.resources.ClientReferenceableFile;
 import com.jaspersoft.jasperserver.dto.resources.ClientReportUnit;
 import com.jaspersoft.jasperserver.dto.resources.ClientResource;
 import com.jaspersoft.jasperserver.dto.resources.ClientResourceListWrapper;
+import com.jaspersoft.jasperserver.dto.resources.domain.ClientDomain;
 import com.jaspersoft.jasperserver.jaxrs.client.RestClientTestUtil;
 import com.jaspersoft.jasperserver.jaxrs.client.core.operationresult.OperationResult;
 import java.io.ByteArrayInputStream;
@@ -153,6 +154,21 @@ public class ResourcesServiceTest extends RestClientTestUtil {
         Assert.assertNotNull(clientResource);
         Assert.assertNotNull(clientResource.getCreationDate());
     }
+
+    @Test
+    public void should_get_domain_descriptor() throws InterruptedException {
+
+        // When
+        OperationResult<ClientDomain> result = session
+                .resourcesService()
+                .resource("/public/Samples/Domains/supermartDomain")
+                .get(ClientDomain.class);
+
+        Assert.assertNotNull(result);
+        Assert.assertNotNull(result.getEntity().getCreationDate());
+    }
+
+
     @Test
     public void should_return_resource() throws InterruptedException {
 

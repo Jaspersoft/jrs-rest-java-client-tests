@@ -28,7 +28,7 @@ public class TopicContextTest extends RestClientTestUtil {
     public void before() {
         initClient();
         initSession();
-        reportUnit = new ClientReportUnit().setUri("/temp/AllAccounts");
+        reportUnit = new ClientReportUnit().setUri("/public/Samples/Reports/14.PerformanceSummary");
     }
 
     @AfterClass

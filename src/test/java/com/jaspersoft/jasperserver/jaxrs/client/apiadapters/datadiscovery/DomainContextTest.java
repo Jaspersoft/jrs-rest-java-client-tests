@@ -1,7 +1,7 @@
 package com.jaspersoft.jasperserver.jaxrs.client.apiadapters.datadiscovery;
 
 import com.jaspersoft.jasperserver.dto.resources.ClientSemanticLayerDataSource;
-import com.jaspersoft.jasperserver.dto.resources.domain.DataIslandsContainer;
+import com.jaspersoft.jasperserver.dto.resources.domain.PresentationGroupElement;
 import com.jaspersoft.jasperserver.jaxrs.client.RestClientTestUtil;
 import com.jaspersoft.jasperserver.jaxrs.client.core.operationresult.OperationResult;
 import javax.ws.rs.core.Response;
@@ -54,7 +54,7 @@ public class DomainContextTest extends RestClientTestUtil {
 
     @Test(dependsOnMethods = "should_create_context")
     public void should_get_metadata() {
-        OperationResult<DataIslandsContainer> operationResult = session
+        OperationResult<PresentationGroupElement> operationResult = session
                 .dataDiscoveryService()
                 .domainContext()
                 .fetchMetadataById(uuId);
@@ -65,7 +65,7 @@ public class DomainContextTest extends RestClientTestUtil {
 
     @Test
     public void should_create_context_and_get_metadata() {
-        OperationResult<DataIslandsContainer> operationResult = session
+        OperationResult<PresentationGroupElement> operationResult = session
                 .dataDiscoveryService()
                 .domainContext()
                 .fetchMetadataByContext(domainContext);

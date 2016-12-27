@@ -6,13 +6,14 @@
 
     <groupId>com.jaspersoft</groupId>
     <artifactId>jrs-rest-java-client-tests</artifactId>
-    <version>6.2.1</version>
+    <version>develop-context-SNAPSHOT</version>
     <name>Integration tests for JasperReports server REST client</name>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <test.properties.file>src/main/resources/default_test_config.properties</test.properties.file>
-        <jrs.client.version>6.3.4-SNAPSHOT</jrs.client.version>
+        <!--<jrs.client.version>develop-context-SNAPSHOT</jrs.client.version>-->
+        <jrs.client.version>domain-context-SNAPSHOT</jrs.client.version>
     </properties>
     <repositories>
         <repository>

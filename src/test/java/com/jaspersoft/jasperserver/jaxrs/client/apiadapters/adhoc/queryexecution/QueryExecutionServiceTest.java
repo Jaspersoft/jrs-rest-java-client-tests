@@ -22,6 +22,7 @@ import com.jaspersoft.jasperserver.dto.executions.ClientMultiLevelQueryResultDat
 import com.jaspersoft.jasperserver.dto.executions.ClientProvidedQueryExecution;
 import com.jaspersoft.jasperserver.dto.executions.ClientQueryParams;
 import com.jaspersoft.jasperserver.dto.executions.ClientQueryResultData;
+import com.jaspersoft.jasperserver.dto.executions.QueryResultDataMediaType;
 import com.jaspersoft.jasperserver.jaxrs.client.RestClientTestUtil;
 import com.jaspersoft.jasperserver.jaxrs.client.core.operationresult.OperationResult;
 import java.text.ParseException;
@@ -112,6 +113,44 @@ public class QueryExecutionServiceTest extends RestClientTestUtil {
         OperationResult<ClientMultiLevelQueryResultData> execute = session.
                 queryExecutionService().
                 multiLevelQuery().
+                execute(queryExecution);
+
+        // Then
+        assertEquals(Response.Status.OK.getStatusCode(), execute.getResponse().getStatus());
+        assertNotNull(execute);
+    }
+
+    @Test(enabled = true)
+    public void should_get_multi_level_data_result_set_as_flat_data() throws ParseException {
+        // Given
+        LinkedList<ClientQueryField> fields = new LinkedList<ClientQueryField>();
+        fields.add(new ClientQueryField().setId("city1").
+                setDataSourceField(new ClientDataSourceField().
+                        setName("sales_fact_ALL.sales__store.sales__store__region.sales__store__region__sales_city").
+                        setType("String")));
+
+        ClientEquals clientEquals = new ClientEquals();
+        clientEquals.
+                getOperands().add(new ClientVariable("city1"));
+        clientEquals.
+                getOperands().add(new ClientString("San Francisco"));
+
+        ClientWhere where = new ClientWhere().setFilterExpressionObject(clientEquals);
+
+        ClientMultiLevelQuery query = (ClientMultiLevelQuery) new ClientMultiLevelQuery().
+                setSelect(new ClientSelect().setFields(fields)).
+                setWhere(where).setLimit(1000);
+
+        ClientMultiLevelQueryExecution queryExecution = new ClientMultiLevelQueryExecution().
+                setDataSourceUri("/public/Samples/Ad_Hoc_Views/04__Product_Results_by_Store_Type").
+                setQuery(query).
+                setParams(new ClientQueryParams().setOffset(new int[]{0}).setPageSize(new int[]{100}));
+
+        // When
+        OperationResult<ClientMultiLevelQueryResultData> execute = session.
+                queryExecutionService().
+                multiLevelQuery().
+                asResultDataSet(QueryResultDataMediaType.FLAT_DATA_JSON).
                 execute(queryExecution);
 
         // Then

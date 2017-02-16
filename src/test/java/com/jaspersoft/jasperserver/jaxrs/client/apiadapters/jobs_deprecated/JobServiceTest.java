@@ -1,13 +1,14 @@
-package com.jaspersoft.jasperserver.jaxrs.client.apiadapters.jobs;
+package com.jaspersoft.jasperserver.jaxrs.client.apiadapters.jobs_deprecated;
 
-import com.jaspersoft.jasperserver.dto.common.OutputFormat;
-import com.jaspersoft.jasperserver.dto.job.ClientIntervalUnitType;
-import com.jaspersoft.jasperserver.dto.job.ClientJobRepositoryDestination;
-import com.jaspersoft.jasperserver.dto.job.ClientJobSimpleTrigger;
-import com.jaspersoft.jasperserver.dto.job.ClientJobSource;
-import com.jaspersoft.jasperserver.dto.job.ClientReportJob;
 import com.jaspersoft.jasperserver.jaxrs.client.RestClientTestUtil;
 import com.jaspersoft.jasperserver.jaxrs.client.core.operationresult.OperationResult;
+import com.jaspersoft.jasperserver.jaxrs.client.dto.jobs.IntervalUnitType;
+import com.jaspersoft.jasperserver.jaxrs.client.dto.jobs.Job;
+import com.jaspersoft.jasperserver.jaxrs.client.dto.jobs.JobSource;
+import com.jaspersoft.jasperserver.jaxrs.client.dto.jobs.OutputFormat;
+import com.jaspersoft.jasperserver.jaxrs.client.dto.jobs.RepositoryDestination;
+import com.jaspersoft.jasperserver.jaxrs.client.dto.jobs.SimpleTrigger;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -34,14 +35,14 @@ public class JobServiceTest extends RestClientTestUtil{
     @Test
     public void should_scheduled_report() {
         // Given
-        ClientReportJob job = new ClientReportJob();
+        Job job = new Job();
         job.setLabel("New Job for ISS Report");
         job.setDescription("New Job for the report template: " + reportUri);
 
-        ClientJobSource jobSource = new ClientJobSource();
+        JobSource jobSource = new JobSource();
         jobSource.setReportUnitURI(reportUri);
 
-        Map<String, String[]> parameterValues = new LinkedHashMap<String, String[]>();
+        Map<String, Object> parameterValues = new LinkedHashMap<String, Object>();
         parameterValues.put("Country_multi_select", new String[]{"USA"});
         parameterValues.put("Cascading_name_single_select", new String[]{"Chin-Lovell Engineering Associates"});
         parameterValues.put("Cascading_state_multi_select", new String[]{"DF", "Jalisco", "Mexico"});
@@ -54,21 +55,21 @@ public class JobServiceTest extends RestClientTestUtil{
         outputFormats.add(OutputFormat.XLSX);
         job.setOutputFormats(outputFormats);
 
-        ClientJobRepositoryDestination repositoryDestination = new ClientJobRepositoryDestination();
+        RepositoryDestination repositoryDestination = new RepositoryDestination();
         repositoryDestination.setSaveToRepository(true);
 
         repositoryDestination.setFolderURI("/organizations/organization_1/adhoc/topics");
         job.setRepositoryDestination(repositoryDestination);
-        ClientJobSimpleTrigger trigger = new ClientJobSimpleTrigger();
-        trigger.setStartType(ClientJobSimpleTrigger.START_TYPE_NOW);
+        SimpleTrigger trigger = new SimpleTrigger();
+        trigger.setStartType(SimpleTrigger.START_TYPE_NOW);
         trigger.setOccurrenceCount(1);
         trigger.setRecurrenceInterval(0);
-        trigger.setRecurrenceIntervalUnit(ClientIntervalUnitType.DAY);
+        trigger.setRecurrenceIntervalUnit(IntervalUnitType.DAY);
         job.setTrigger(trigger);
         job.setBaseOutputFilename("Cascading_multi_select_topic" + System.currentTimeMillis());
 
         // When
-        OperationResult<ClientReportJob> result = session
+        OperationResult<Job> result = session
                 .jobsService()
                 .scheduleReport(job);
 
@@ -76,9 +77,9 @@ public class JobServiceTest extends RestClientTestUtil{
 
         // Then
         assertNotNull(job.getSource().getParameters());
-        assertEquals(parameterValues.get("Country_multi_select"), job.getSource().getParameters().get("Country_multi_select"));
-        assertEquals(parameterValues.get("Cascading_name_single_select"), job.getSource().getParameters().get("Cascading_name_single_select"));
-        assertEquals(parameterValues.get("Cascading_state_multi_select"), job.getSource().getParameters().get("Cascading_state_multi_select"));
+        assertEquals(parameterValues.get("Country_multi_select"), ((ArrayList) job.getSource().getParameters().get("Country_multi_select")).toArray());
+        assertEquals(parameterValues.get("Cascading_name_single_select"), ((ArrayList) job.getSource().getParameters().get("Cascading_name_single_select")).toArray());
+        assertEquals(parameterValues.get("Cascading_state_multi_select"), ((ArrayList) job.getSource().getParameters().get("Cascading_state_multi_select")).toArray());
 
 
     }

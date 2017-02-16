@@ -1,9 +1,9 @@
-package com.jaspersoft.jasperserver.jaxrs.client.apiadapters.jobs.calendar;
+package com.jaspersoft.jasperserver.jaxrs.client.apiadapters.jobs_deprecated.calendar;
 
 import com.jaspersoft.jasperserver.jaxrs.client.RestClientTestUtil;
 import com.jaspersoft.jasperserver.jaxrs.client.core.operationresult.OperationResult;
-import com.jaspersoft.jasperserver.dto.job.ClientJobCalendar;
-import com.jaspersoft.jasperserver.jaxrs.client.dto.jobs.calendar.WeeklyCalendar;
+import com.jaspersoft.jasperserver.jaxrs.client.dto.jobs.ReportJobCalendar;
+import com.jaspersoft.jasperserver.jaxrs.client.dto.jobs.calendars.WeeklyCalendar;
 import java.util.TimeZone;
 import javax.ws.rs.core.Response;
 import org.testng.annotations.AfterClass;
@@ -12,8 +12,8 @@ import org.testng.annotations.Test;
 
 import static org.testng.AssertJUnit.assertEquals;
 import static org.testng.AssertJUnit.assertFalse;
-import static org.testng.AssertJUnit.assertNotNull;
 import static org.testng.AssertJUnit.assertTrue;
+import static org.testng.AssertJUnit.assertNotNull;
 
 /**
  * @author Tetiana Iefimenko
@@ -43,12 +43,12 @@ public class WeeklyCalendarTest extends RestClientTestUtil {
                 true    // Saturday
         });
         // When
-        OperationResult<ClientJobCalendar> operationResult = session
+        OperationResult<ReportJobCalendar> operationResult = session
                 .jobsService()
                 .calendar("TestCalendar")
-                .createNewCalendar(calendar);
+                .createNew(calendar);
 
-        ClientJobCalendar jobCalendar = operationResult.getEntity();
+        ReportJobCalendar jobCalendar = operationResult.getEntity();
 
         // Then
         assertEquals(Response.Status.OK.getStatusCode(), operationResult.getResponse().getStatus());

@@ -39,11 +39,25 @@ public class JasperserverRestClientTest extends RestClientTestUtil {
     }
 
     @Test
-    public void should_return_session_via_j_sucurity_check_with_user_time_zone_as_object() {
+    public void should_return_session_via_j_security_check_with_user_time_zone_as_object() {
         session = client.authenticate(USER_NAME, PASSWORD, TimeZone.getTimeZone(USER_TIME_ZONE));
         assertNotNull(session);
         assertNotNull(session.getStorage().getUserTimeZone());
         assertEquals(USER_TIME_ZONE, session.getStorage().getUserTimeZone().getID());
+    }
+
+    @Test
+    public void should_return_session_via_j_security_check_with_anonymous_user_when_password_is_null() {
+        session = client.authenticate("anonymousUser", null);
+        assertNotNull(session);
+        assertNotNull(session.getStorage().getSessionId());
+    }
+
+    @Test
+    public void should_return_session_via_j_security_check_with_anonymous_user_when_password_is_empty() {
+        session = client.authenticate("anonymousUser", "");
+        assertNotNull(session);
+        assertNotNull(session.getStorage().getSessionId());
     }
 
     @Test(expectedExceptions = AuthenticationFailedException.class)
@@ -58,7 +72,7 @@ public class JasperserverRestClientTest extends RestClientTestUtil {
 
     }
 
-    @Test(expectedExceptions = JSClientWebException.class)
+    @Test (expectedExceptions = JSClientWebException.class)
     public void should_throw_exception_with_wrong_server_uri() {
         configuration.setJasperReportsServerUrl("http://localhost");
         session = client.authenticate(USER_NAME, PASSWORD);
@@ -69,6 +83,19 @@ public class JasperserverRestClientTest extends RestClientTestUtil {
     public void should_return_session_via_basic_login() {
         configuration.setAuthenticationType(AuthenticationType.BASIC);
         session = client.authenticate("jasperadmin", "jasperadmin");
+        assertNotNull(session);
+    }
+
+    @Test
+    public void should_return_session_via_basic_login_as_anonimous_user_when_password_is_null() {
+        configuration.setAuthenticationType(AuthenticationType.BASIC);
+        session = client.authenticate("anonymousUser", null);
+        assertNotNull(session);
+    }
+    @Test
+    public void should_return_session_via_basic_login_as_anonimous_user_when_password_is_empty() {
+        configuration.setAuthenticationType(AuthenticationType.BASIC);
+        session = client.authenticate("anonymousUser", "");
         assertNotNull(session);
     }
 

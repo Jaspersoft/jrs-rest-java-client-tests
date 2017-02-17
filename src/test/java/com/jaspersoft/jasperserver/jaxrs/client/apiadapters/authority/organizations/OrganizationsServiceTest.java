@@ -19,6 +19,8 @@ import static org.testng.Assert.assertNull;
  */
 public class OrganizationsServiceTest extends RestClientTestUtil {
 
+    public static final String TEST_ID = "test_Id";
+    public static final String TEST_ALIAS = "test_alias";
     private ClientTenant organization;
 
 
@@ -27,16 +29,30 @@ public class OrganizationsServiceTest extends RestClientTestUtil {
         initClient();
         initSession();
         organization = new ClientTenant();
-        organization.setAlias("test_org");
-        organization.setId("test_Id");
+        organization.setAlias(TEST_ALIAS);
+        organization.setId(TEST_ID);
     }
 
     @Test
-    public void should_create_organization() {
+    public void should_create_organization_by_object() {
 
         OperationResult<ClientTenant> operationResult = session
                 .organizationsService()
                 .organization(organization)
+                .create();
+
+        ClientTenant entity = operationResult.getEntity();
+
+        assertEquals(Response.Status.CREATED.getStatusCode(), operationResult.getResponse().getStatus());
+        assertNotNull(entity);
+    }
+
+    @Test
+    public void should_create_organization_by_alias() {
+
+        OperationResult<ClientTenant> operationResult = session
+                .organizationsService()
+                .organization(new ClientTenant().setAlias(TEST_ALIAS))
                 .create();
 
         ClientTenant entity = operationResult.getEntity();

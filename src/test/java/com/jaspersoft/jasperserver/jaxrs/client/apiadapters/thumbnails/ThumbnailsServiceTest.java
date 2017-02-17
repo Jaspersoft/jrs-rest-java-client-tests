@@ -14,15 +14,17 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import static java.util.Arrays.asList;
+import static org.junit.Assert.assertNull;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertTrue;
 
 public class ThumbnailsServiceTest extends RestClientTestUtil {
-    private String reportUri1 = "/public/Samples/Reports/08g.UnitSalesDetailReport";
-    private String reportUri2 = "/public/Samples/Reports/11g.SalesByMonthReport";
+    private final String EXIST_THUMBNAIL_REPORT_URI_1 = "/public/Samples/Reports/08g.UnitSalesDetailReport";
+    private final String EXIST_THUMBNAIL_REPORT_URI_2 = "/public/Samples/Reports/11g.SalesByMonthReport";
+    private final String NOT_EXIST_THUMBNAIL_REPORT_URI_1 = "/public/Samples/Reports/04._Product_Results_by_Store_Type_Report";
+    private final String NOT_EXIST_THUMBNAIL_REPORT_URI_2 = "/public/Samples/Reports/02._Sales_Mix_by_Demographic_Report";
 
     @BeforeClass
     public void before() {
@@ -31,11 +33,26 @@ public class ThumbnailsServiceTest extends RestClientTestUtil {
     }
 
     @Test
-    public void should_return_list_of_thumbnails_with_default_request_method() {
+    public void should_return_list_of_thumbnails_with_default_request_method_without_default_picture() {
         // When
         List<ResourceThumbnail> entity = session.thumbnailsService()
                 .thumbnails()
-                .reports(reportUri1, reportUri2)
+                .reports(EXIST_THUMBNAIL_REPORT_URI_1, EXIST_THUMBNAIL_REPORT_URI_2)
+                .get()
+                .getEntity()
+                .getThumbnails();
+        // Then
+        assertNotNull(entity);
+        assertTrue(entity.size() == 2);
+        assertFalse(entity.get(0).getThumbnailData().isEmpty());
+        assertFalse(entity.get(1).getThumbnailData().isEmpty());
+    }
+    @Test
+    public void should_return_list_of_thumbnails_with_default_request_method_with_default_picture() {
+        // When
+        List<ResourceThumbnail> entity = session.thumbnailsService()
+                .thumbnails()
+                .reports(EXIST_THUMBNAIL_REPORT_URI_1, EXIST_THUMBNAIL_REPORT_URI_2)
                 .defaultAllowed(true)
                 .get()
                 .getEntity()
@@ -47,15 +64,64 @@ public class ThumbnailsServiceTest extends RestClientTestUtil {
         assertFalse(entity.get(1).getThumbnailData().isEmpty());
     }
 
-
     @Test
-    public void should_return_list_of_thumbnails_with_default_request_method_without_default_image() {
+    public void should_return_list_of_thumbnails_with_get_request_method_and_default_picture() {
         // When
         List<ResourceThumbnail> entity = session.thumbnailsService()
                 .thumbnails()
-                .reports(reportUri1,
-                        reportUri2)
-                .defaultAllowed(false)
+                .reports(EXIST_THUMBNAIL_REPORT_URI_1, EXIST_THUMBNAIL_REPORT_URI_2)
+                .defaultAllowed(true)
+                .requestMethod(RequestMethod.GET)
+                .get()
+                .getEntity()
+                .getThumbnails();
+        // Then
+        assertNotNull(entity);
+        assertTrue(entity.size() == 2);
+        assertFalse(entity.get(0).getThumbnailData().isEmpty());
+        assertFalse(entity.get(1).getThumbnailData().isEmpty());
+    }
+
+    @Test
+    public void should_return_list_of_thumbnails_with_get_request_method_and_without_default_picture() {
+        // When
+        List<ResourceThumbnail> entity = session.thumbnailsService()
+                .thumbnails()
+                .reports(EXIST_THUMBNAIL_REPORT_URI_1, EXIST_THUMBNAIL_REPORT_URI_2)
+                .requestMethod(RequestMethod.GET)
+                .get()
+                .getEntity()
+                .getThumbnails();
+        // Then
+        assertNotNull(entity);
+        assertTrue(entity.size() == 2);
+        assertFalse(entity.get(0).getThumbnailData().isEmpty());
+        assertFalse(entity.get(1).getThumbnailData().isEmpty());
+    }
+
+    @Test
+    public void should_not_return_list_of_thumbnails_without_default_picture() {
+        // When
+        List<ResourceThumbnail> entity = session.thumbnailsService()
+                .thumbnails()
+                .reports(NOT_EXIST_THUMBNAIL_REPORT_URI_1,
+                        NOT_EXIST_THUMBNAIL_REPORT_URI_2)
+                .get()
+                .getEntity()
+                .getThumbnails();
+        // Then
+        assertNotNull(entity);
+        assertTrue(entity.get(0).getThumbnailData().isEmpty());
+        assertTrue(entity.get(1).getThumbnailData().isEmpty());
+    }
+
+    @Test
+    public void should_return_list_of_default_pictures_with_default_request_method() {
+        // When
+        List<ResourceThumbnail> entity = session.thumbnailsService()
+                .thumbnails()
+                .reports(NOT_EXIST_THUMBNAIL_REPORT_URI_1, NOT_EXIST_THUMBNAIL_REPORT_URI_2)
+                .defaultAllowed(true)
                 .get()
                 .getEntity()
                 .getThumbnails();
@@ -71,9 +137,9 @@ public class ThumbnailsServiceTest extends RestClientTestUtil {
         // When
         List<ResourceThumbnail> entity = session.thumbnailsService()
                 .thumbnails()
-                .reports(asList(reportUri1,
-                        reportUri2))
-                .defaultAllowed(true).requestMethod(RequestMethod.GET)
+                .reports(NOT_EXIST_THUMBNAIL_REPORT_URI_1, NOT_EXIST_THUMBNAIL_REPORT_URI_2)
+                .defaultAllowed(true)
+                .requestMethod(RequestMethod.GET)
                 .get()
                 .getEntity()
                 .getThumbnails();
@@ -85,21 +151,19 @@ public class ThumbnailsServiceTest extends RestClientTestUtil {
     }
 
     @Test
-    public void should_return_list_of_thumbnails_with_get_request_method_without_default_image() {
+    public void should_not_return_list_of_thumbnails_with_get_request_method() {
         // When
         List<ResourceThumbnail> entity = session.thumbnailsService()
                 .thumbnails()
-                .reports(asList(reportUri1,
-                        reportUri2))
-                .defaultAllowed(false).requestMethod(RequestMethod.GET)
+                .reports(NOT_EXIST_THUMBNAIL_REPORT_URI_1, NOT_EXIST_THUMBNAIL_REPORT_URI_2)
+                .requestMethod(RequestMethod.GET)
                 .get()
                 .getEntity()
                 .getThumbnails();
         // Then
         assertNotNull(entity);
-        assertTrue(entity.size() == 2);
-        assertFalse(entity.get(0).getThumbnailData().isEmpty());
-        assertFalse(entity.get(1).getThumbnailData().isEmpty());
+        assertTrue(entity.get(0).getThumbnailData().isEmpty());
+        assertTrue(entity.get(1).getThumbnailData().isEmpty());
     }
 
     @Test
@@ -107,7 +171,20 @@ public class ThumbnailsServiceTest extends RestClientTestUtil {
         // When
         InputStream entity = session.thumbnailsService()
                 .thumbnail()
-                .report(reportUri1)
+                .report(EXIST_THUMBNAIL_REPORT_URI_1)
+                .get()
+                .getEntity();
+        // Then
+        assertNotNull(entity);
+    }
+
+
+    @Test
+    public void should_return_single_thumbnail_as_stream_with_default_allowed() throws IOException {
+        // When
+        InputStream entity = session.thumbnailsService()
+                .thumbnail()
+                .report(EXIST_THUMBNAIL_REPORT_URI_1)
                 .defaultAllowed(true)
                 .get()
                 .getEntity();
@@ -116,12 +193,24 @@ public class ThumbnailsServiceTest extends RestClientTestUtil {
     }
 
     @Test
-    public void should_return_single_thumbnail_as_stream_without_default_image() throws IOException {
+    public void should_not_return_single_thumbnail_as_stream_without_default_image() throws IOException {
         // When
         InputStream entity = session.thumbnailsService()
                 .thumbnail()
-                .report(reportUri2)
-                .defaultAllowed(false)
+                .report(NOT_EXIST_THUMBNAIL_REPORT_URI_1)
+                .get()
+                .getEntity();
+        // Then
+        assertNull(entity);
+    }
+
+    @Test
+    public void should_return_default_picture_as_stream() throws IOException {
+        // When
+        InputStream entity = session.thumbnailsService()
+                .thumbnail()
+                .report(NOT_EXIST_THUMBNAIL_REPORT_URI_1)
+                .defaultAllowed(true)
                 .get()
                 .getEntity();
         // Then

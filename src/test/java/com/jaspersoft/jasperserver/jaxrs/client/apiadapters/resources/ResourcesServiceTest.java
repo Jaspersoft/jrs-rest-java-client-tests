@@ -8,6 +8,7 @@ import com.jaspersoft.jasperserver.dto.resources.ClientReferenceableFile;
 import com.jaspersoft.jasperserver.dto.resources.ClientReportUnit;
 import com.jaspersoft.jasperserver.dto.resources.ClientResource;
 import com.jaspersoft.jasperserver.dto.resources.ClientResourceListWrapper;
+import com.jaspersoft.jasperserver.dto.resources.domain.ClientDomain;
 import com.jaspersoft.jasperserver.jaxrs.client.RestClientTestUtil;
 import com.jaspersoft.jasperserver.jaxrs.client.core.operationresult.OperationResult;
 import java.io.ByteArrayInputStream;
@@ -33,6 +34,8 @@ import static org.testng.Assert.assertTrue;
  */
 public class ResourcesServiceTest extends RestClientTestUtil {
 
+    private ClientDomain testDomain;
+
     @BeforeClass
     public void before() {
         initClient();
@@ -55,6 +58,39 @@ public class ResourcesServiceTest extends RestClientTestUtil {
 
         assertNotNull(resourceListWrapper);
         assertTrue(resourceListWrapper.getResourceLookups().size() > 0);
+    }
+
+    @Test
+    public void should_return_domain_as_resource() {
+
+        // When
+
+        OperationResult<ClientDomain> result = session
+                .resourcesService()
+                .resource("/organizations/organization_1/AdditionalResourcesForTesting/Domains/Domain_for_special_characters_testing")
+                .get(ClientDomain.class);
+
+
+
+        // Then
+
+        assertNotNull(result.getEntity());
+        testDomain = result.getEntity();
+    }
+
+    @Test(dependsOnMethods ="should_return_domain_as_resource")
+    public void should_create_domain_as_resource() {
+
+        // When
+
+        OperationResult<ClientResource> result = session
+                .resourcesService()
+                .resource("/public")
+                .createNew(testDomain);
+
+        // Then
+
+        assertNotNull(result.getEntity());
     }
 
 
@@ -153,6 +189,21 @@ public class ResourcesServiceTest extends RestClientTestUtil {
         Assert.assertNotNull(clientResource);
         Assert.assertNotNull(clientResource.getCreationDate());
     }
+
+    @Test
+    public void should_get_domain_descriptor() throws InterruptedException {
+
+        // When
+        OperationResult<ClientDomain> result = session
+                .resourcesService()
+                .resource("/public/Samples/Domains/supermartDomain")
+                .get(ClientDomain.class);
+
+        Assert.assertNotNull(result);
+        Assert.assertNotNull(result.getEntity().getCreationDate());
+    }
+
+
     @Test
     public void should_return_resource() throws InterruptedException {
 

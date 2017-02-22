@@ -147,7 +147,7 @@ public class QueryExecutionServiceTest extends RestClientTestUtil {
                 setParams(new ClientQueryParams().setOffset(new int[]{0}).setPageSize(new int[]{100}));
 
         // When
-        OperationResult<ClientMultiLevelQueryResultData> execute = session.
+        OperationResult<ClientFlatQueryResultData> execute = session.
                 queryExecutionService().
                 multiLevelQuery().
                 asResultDataSet(QueryResultDataMediaType.FLAT_DATA_JSON).

@@ -1,7 +1,7 @@
 package com.jaspersoft.jasperserver.jaxrs.client.apiadapters.connections;
 
 import com.jaspersoft.jasperserver.jaxrs.client.RestClientTestUtil;
-import com.jaspersoft.jasperserver.jaxrs.client.core.enums.ConnectionMediaType;
+import com.jaspersoft.jasperserver.jaxrs.client.core.enums.ContextMediaTypes;
 import com.jaspersoft.jasperserver.jaxrs.client.core.operationresult.OperationResult;
 import com.jaspersoft.jasperserver.dto.connection.LfsConnection;
 import javax.ws.rs.core.Response;
@@ -38,7 +38,7 @@ public class LocalFileSystemConnectionsServiceTest extends RestClientTestUtil {
     public void should_create_connection() {
         OperationResult<LfsConnection> operationResult = session
                 .connectionsService()
-                .connection(LfsConnection.class, ConnectionMediaType.LOCAL_FILE_SYSTEM_TYPE)
+                .connection(LfsConnection.class, ContextMediaTypes.LOCAL_FILE_SYSTEM_TYPE)
                 .create(new LfsConnection().setPath("C:\\"));
 
         assertEquals(Response.Status.CREATED.getStatusCode(), operationResult.getResponse().getStatus());
@@ -51,7 +51,7 @@ public class LocalFileSystemConnectionsServiceTest extends RestClientTestUtil {
     public void should_update_connection() {
         OperationResult<LfsConnection> operationResult = session
                 .connectionsService()
-                .connection(LfsConnection.class, ConnectionMediaType.LOCAL_FILE_SYSTEM_TYPE, uuId)
+                .connection(LfsConnection.class, ContextMediaTypes.LOCAL_FILE_SYSTEM_TYPE, uuId)
                 .update(new LfsConnection().setPath("C:\\"));
 
         assertEquals(Response.Status.OK.getStatusCode(), operationResult.getResponse().getStatus());
@@ -61,7 +61,7 @@ public class LocalFileSystemConnectionsServiceTest extends RestClientTestUtil {
     public void should_get_connection() {
         OperationResult<LfsConnection> operationResult = session
                 .connectionsService()
-                .connection(LfsConnection.class, ConnectionMediaType.LOCAL_FILE_SYSTEM_TYPE, uuId)
+                .connection(LfsConnection.class, ContextMediaTypes.LOCAL_FILE_SYSTEM_TYPE, uuId)
                 .get();
 
         assertEquals(Response.Status.OK.getStatusCode(), operationResult.getResponse().getStatus());

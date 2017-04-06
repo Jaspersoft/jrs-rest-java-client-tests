@@ -3,7 +3,7 @@ package com.jaspersoft.jasperserver.jaxrs.client.apiadapters.connections;
 import com.jaspersoft.jasperserver.dto.resources.ClientJdbcDataSource;
 import com.jaspersoft.jasperserver.dto.resources.domain.ResourceGroupElement;
 import com.jaspersoft.jasperserver.jaxrs.client.RestClientTestUtil;
-import com.jaspersoft.jasperserver.jaxrs.client.core.enums.ConnectionMediaType;
+import com.jaspersoft.jasperserver.jaxrs.client.core.enums.ContextMediaTypes;
 import com.jaspersoft.jasperserver.jaxrs.client.core.operationresult.OperationResult;
 import java.util.Map;
 import javax.ws.rs.core.Response;
@@ -49,7 +49,7 @@ public class JdbcConnectionsServiceTest extends RestClientTestUtil {
 
         OperationResult<ClientJdbcDataSource> operationResult = session
                 .connectionsService()
-                .connection(ClientJdbcDataSource.class, ConnectionMediaType.JDBC_DATA_SOURCE_TYPE)
+                .connection(ClientJdbcDataSource.class, ContextMediaTypes.JDBC_DATA_SOURCE_TYPE)
                 .create(connection);
 
         assertNotNull(operationResult);
@@ -63,7 +63,7 @@ public class JdbcConnectionsServiceTest extends RestClientTestUtil {
     public void should_update_connection() {
         OperationResult<ClientJdbcDataSource> operationResult = session
                 .connectionsService()
-                .connection(ClientJdbcDataSource.class, ConnectionMediaType.JDBC_DATA_SOURCE_TYPE, uuId)
+                .connection(ClientJdbcDataSource.class, ContextMediaTypes.JDBC_DATA_SOURCE_TYPE, uuId)
                 .update(connection.setDescription("Test connection"));
 
         assertNotNull(operationResult);
@@ -75,7 +75,7 @@ public class JdbcConnectionsServiceTest extends RestClientTestUtil {
     public void should_get_connection() {
         OperationResult<? extends ClientJdbcDataSource> operationResult = session
                 .connectionsService()
-                .connection(ClientJdbcDataSource.class, ConnectionMediaType.JDBC_DATA_SOURCE_TYPE, uuId)
+                .connection(ClientJdbcDataSource.class, ContextMediaTypes.JDBC_DATA_SOURCE_TYPE, uuId)
                 .get();
 
         assertNotNull(operationResult);
@@ -87,7 +87,7 @@ public class JdbcConnectionsServiceTest extends RestClientTestUtil {
         OperationResult<ResourceGroupElement> operationResult = session
                 .connectionsService()
                 .connection(uuId, ResourceGroupElement.class,
-                        ConnectionMediaType.JDBC_DATA_SOURCE_METADATA_TYPE)
+                        ContextMediaTypes.JDBC_DATA_SOURCE_METADATA_TYPE)
                 .metadata();
 
         assertNotNull(operationResult);
@@ -110,9 +110,9 @@ public class JdbcConnectionsServiceTest extends RestClientTestUtil {
         OperationResult<ResourceGroupElement> operationResult = session
                 .connectionsService()
                 .connection(ClientJdbcDataSource.class,
-                        ConnectionMediaType.JDBC_DATA_SOURCE_TYPE,
+                        ContextMediaTypes.JDBC_DATA_SOURCE_TYPE,
                         ResourceGroupElement.class,
-                        ConnectionMediaType.JDBC_DATA_SOURCE_METADATA_TYPE)
+                        ContextMediaTypes.JDBC_DATA_SOURCE_METADATA_TYPE)
                 .createAndGetMetadata(connection);
 
         assertNotNull(operationResult);

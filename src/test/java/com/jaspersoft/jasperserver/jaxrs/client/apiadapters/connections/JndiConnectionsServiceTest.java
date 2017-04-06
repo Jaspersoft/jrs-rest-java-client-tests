@@ -2,7 +2,7 @@ package com.jaspersoft.jasperserver.jaxrs.client.apiadapters.connections;
 
 import com.jaspersoft.jasperserver.dto.resources.ClientJndiJdbcDataSource;
 import com.jaspersoft.jasperserver.jaxrs.client.RestClientTestUtil;
-import com.jaspersoft.jasperserver.jaxrs.client.core.enums.ConnectionMediaType;
+import com.jaspersoft.jasperserver.jaxrs.client.core.enums.ContextMediaTypes;
 import com.jaspersoft.jasperserver.jaxrs.client.core.operationresult.OperationResult;
 import javax.ws.rs.core.Response;
 import org.testng.annotations.AfterClass;
@@ -42,7 +42,7 @@ public class JndiConnectionsServiceTest extends RestClientTestUtil {
 
         OperationResult<ClientJndiJdbcDataSource> operationResult = session
                 .connectionsService()
-                .connection(ClientJndiJdbcDataSource.class, ConnectionMediaType.JNDI_JDBC_DATA_SOURCE_TYPE)
+                .connection(ClientJndiJdbcDataSource.class, ContextMediaTypes.JNDI_JDBC_DATA_SOURCE_TYPE)
                 .create(connection);
 
         assertEquals(Response.Status.CREATED.getStatusCode(), operationResult.getResponse().getStatus());
@@ -55,7 +55,7 @@ public class JndiConnectionsServiceTest extends RestClientTestUtil {
     public void should_update_connection() {
         OperationResult<ClientJndiJdbcDataSource> operationResult = session
                 .connectionsService()
-                .connection(ClientJndiJdbcDataSource.class, ConnectionMediaType.JNDI_JDBC_DATA_SOURCE_TYPE, uuId)
+                .connection(ClientJndiJdbcDataSource.class, ContextMediaTypes.JNDI_JDBC_DATA_SOURCE_TYPE, uuId)
                 .update(connection.setDescription("Test connection"));
 
         assertEquals(Response.Status.OK.getStatusCode(), operationResult.getResponse().getStatus());
@@ -65,7 +65,7 @@ public class JndiConnectionsServiceTest extends RestClientTestUtil {
     public void should_get_connection() {
         OperationResult<ClientJndiJdbcDataSource> operationResult = session
                 .connectionsService()
-                .connection(ClientJndiJdbcDataSource.class, ConnectionMediaType.JNDI_JDBC_DATA_SOURCE_TYPE, uuId)
+                .connection(ClientJndiJdbcDataSource.class, ContextMediaTypes.JNDI_JDBC_DATA_SOURCE_TYPE, uuId)
                 .get();
 
         assertEquals(Response.Status.OK.getStatusCode(), operationResult.getResponse().getStatus());

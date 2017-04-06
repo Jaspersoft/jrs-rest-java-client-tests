@@ -25,6 +25,7 @@ import static org.testng.Assert.assertNotNull;
 public class ExportServiceTest extends RestClientTestUtil {
 
     private static final String INPROGRESS_STATUS = "inprogress";
+    private final String TEST_URI = "/public/Samples/Reports/AllAccounts";
 
     @BeforeMethod
     public void before() {
@@ -37,7 +38,7 @@ public class ExportServiceTest extends RestClientTestUtil {
         OperationResult<State> stateOperationResult = session
                 .exportService()
                 .newTask()
-                .uri("/temp/AllAccounts")
+                .uri(TEST_URI)
                 .user("superuser")
                 .role("ROLE_USER")
                 .create();
@@ -68,7 +69,7 @@ public class ExportServiceTest extends RestClientTestUtil {
         OperationResult<State> stateOperationResult = session
                 .exportService()
                 .newTask()
-                .uri("/temp/AllAccounts")
+                .uri(TEST_URI)
                 .create();
 
         State stateDto = stateOperationResult.getEntity();
@@ -97,7 +98,7 @@ public class ExportServiceTest extends RestClientTestUtil {
         OperationResult<State> stateOperationResult = session
                 .exportService()
                 .newTask()
-                .uri("/temp/AllAccounts")
+                .uri(TEST_URI)
                 .allRoles()
                 .allUsers()
                 .create();
@@ -128,7 +129,7 @@ public class ExportServiceTest extends RestClientTestUtil {
         OperationResult<State> stateOperationResult = session
                 .exportService()
                 .newTask()
-                .uri("/temp/AllAccounts")
+                .uri(TEST_URI)
                 .scheduledJob("/temp")
                 .allRoles()
                 .allUsers()
@@ -155,18 +156,6 @@ public class ExportServiceTest extends RestClientTestUtil {
         }
     }
 
-    /*
-    *
-    * session
-                        .exportService()
-                        .newTask()
-                        .uris(Arrays.asList(uri))
-                        .scheduledJobs(Arrays.asList(uri))
-                        .create();
-
-
-                        {"resourceTypes":[],"parameters":[],"users":[],"roles":[],"uris":["/organizations/organization_1/qa_automation/ResourceWizard/VDS_Subfolders/Report_to_Export"],"scheduledJobs":["/organizations/organization_1/qa_automation/ResourceWizard/VDS_Subfolders/Report_to_Export"]}
-    * */
 
     @AfterMethod
     public void after() {

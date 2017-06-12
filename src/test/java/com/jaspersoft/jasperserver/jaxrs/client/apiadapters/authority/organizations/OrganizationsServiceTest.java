@@ -29,8 +29,8 @@ public class OrganizationsServiceTest extends RestClientTestUtil {
         initClient();
         initSession();
         organization = new ClientTenant();
-        organization.setAlias(TEST_ALIAS);
         organization.setId(TEST_ID);
+        organization.setAlias(TEST_ID);
     }
 
     @Test
@@ -61,7 +61,7 @@ public class OrganizationsServiceTest extends RestClientTestUtil {
         assertNotNull(entity);
     }
 
-    @Test(dependsOnMethods = "should_create_organization")
+    @Test(dependsOnMethods = "should_create_organization_by_alias")
     public void should_return_organization() {
 
         OperationResult<ClientTenant> operationResult = session
@@ -122,6 +122,10 @@ public class OrganizationsServiceTest extends RestClientTestUtil {
 
     @AfterClass
     public void after() {
+        OperationResult<ClientTenant> operationResult = session
+                .organizationsService()
+                .organization(new ClientTenant().setId(TEST_ALIAS))
+                .delete();
         session.logout();
         session = null;
     }

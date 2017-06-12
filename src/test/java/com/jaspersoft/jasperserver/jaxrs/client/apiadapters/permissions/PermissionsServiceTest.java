@@ -26,7 +26,7 @@ public class PermissionsServiceTest extends RestClientTestUtil {
     }
 
     @Test
-    public void should_() {
+    public void should_get_permissions() {
         OperationResult<RepositoryPermission> operationResult = session
                 .permissionsService()
                 .resource("/organizations/organization_1/datasources")

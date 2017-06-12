@@ -55,7 +55,7 @@ public class DomainContextServiceTest extends RestClientTestUtil {
         clientDomain = new ClientDomain().setDataSource(dataSource);
         ResourceSingleElement resourceSingleElement = new ResourceSingleElement().
                 setName("account_type").
-                setType("java.lang.String");
+                setType("string");
         ResourceGroupElement account = new ResourceGroupElement().
                 setName("account").
                 setElements(Arrays.<SchemaElement>asList(resourceSingleElement));
@@ -68,7 +68,7 @@ public class DomainContextServiceTest extends RestClientTestUtil {
         PresentationSingleElement presentationSingleElement = new PresentationSingleElement().
                 setName("account_type").
                 setLabel("account_type").
-                setType("java.lang.String").
+                setType("string").
                 setHierarchicalName("public.account.account_type").
                 setResourcePath("FoodmartDataSourceJNDI.public.account.account_type");
         PresentationGroupElement presentationGroupElement = new PresentationGroupElement().setName("account").setElements(Arrays.<PresentationElement>asList(presentationSingleElement));

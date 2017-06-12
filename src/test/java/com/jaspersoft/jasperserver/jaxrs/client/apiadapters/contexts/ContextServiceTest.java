@@ -2,6 +2,7 @@ package com.jaspersoft.jasperserver.jaxrs.client.apiadapters.contexts;
 
 import com.jaspersoft.jasperserver.dto.resources.ClientResourceLookup;
 import com.jaspersoft.jasperserver.dto.resources.domain.PresentationGroupElement;
+import com.jaspersoft.jasperserver.dto.resources.domain.ResourceGroupElement;
 import com.jaspersoft.jasperserver.jaxrs.client.RestClientTestUtil;
 import com.jaspersoft.jasperserver.jaxrs.client.core.operationresult.OperationResult;
 import javax.ws.rs.core.Response;
@@ -120,6 +121,46 @@ public class ContextServiceTest extends RestClientTestUtil {
         assertNotNull(operationResult);
         assertEquals(Response.Status.OK.getStatusCode(), operationResult.getResponse().getStatus());
         assertNotNull(operationResult.getEntity());
+    }
+
+    @Test
+    public void should_create_context_get_metadata_with_parameter_include() {
+
+        OperationResult<ResourceGroupElement> operationResult = session
+                .contextService()
+                .context(ClientResourceLookup.class,
+                        "application/repository.resourceLookup+json",
+                        ResourceGroupElement.class,
+                        "application/repository.resourceLookup.metadata+json")
+                .addParameter("include", "public.account")
+                .createAndGetMetadata(context);
+
+        assertNotNull(operationResult);
+        assertEquals(Response.Status.OK.getStatusCode(), operationResult.getResponse().getStatus());
+
+        extractUuid(operationResult.getResponse().getHeaderString("Location"));
+        assertNotNull(uuId);
+
+    }
+
+    @Test
+    public void should_create_context_get_metadata_with_parameter_expands() {
+
+        OperationResult<ResourceGroupElement> operationResult = session
+                .contextService()
+                .context(ClientResourceLookup.class,
+                        "application/repository.resourceLookup+json",
+                        ResourceGroupElement.class,
+                        "application/repository.resourceLookup.metadata+json")
+                .addParameter("expand", "public.account")
+                .createAndGetMetadata(context);
+
+        assertNotNull(operationResult);
+        assertEquals(Response.Status.OK.getStatusCode(), operationResult.getResponse().getStatus());
+
+        extractUuid(operationResult.getResponse().getHeaderString("Location"));
+        assertNotNull(uuId);
+
     }
 
     private void extractUuid(String locationHeader) {

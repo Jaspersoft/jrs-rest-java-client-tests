@@ -62,26 +62,25 @@ public class JobServiceTest extends RestClientTestUtil{
 
         for (int i = 0; i < 3; i++) {
             job = prepareJob();
-            OperationResult<ClientReportJob> result = session
+            OperationResult<ClientReportJob> scheduleResult = session
                     .jobsService()
                     .scheduleReport(job);
 
-            if (result != null && result.getEntity() != null) {
-                ids.add(String.valueOf(result.getEntity().getId()));
+            if (scheduleResult != null && scheduleResult.getEntity() != null) {
+                ids.add(String.valueOf(scheduleResult.getEntity().getId()));
             }
         }
 
         // When
-        OperationResult<ClientJobIdListWrapper> result = session
+        OperationResult<ClientJobIdListWrapper> deleteResult = session
                 .jobsService()
                 .jobs()
                 .parameters(JobsParameter.JOB_ID, ids.toArray(new String[ids.size()]))
                 .delete();
         // Then
-        assertNotNull(job.getSource().getParameters());
-        assertEquals(new String[]{"USA"}, job.getSource().getParameters().get("Country_multi_select"));
-        assertEquals(new String[]{"Chin-Lovell Engineering Associates"}, job.getSource().getParameters().get("Cascading_name_single_select"));
-        assertEquals(new String[]{"DF", "Jalisco", "Mexico"}, job.getSource().getParameters().get("Cascading_state_multi_select"));
+        assertNotNull(deleteResult.getEntity());
+        assertEquals(3, ids.size());
+        assertEquals(200, deleteResult.getResponse().getStatus());
 
     }
 

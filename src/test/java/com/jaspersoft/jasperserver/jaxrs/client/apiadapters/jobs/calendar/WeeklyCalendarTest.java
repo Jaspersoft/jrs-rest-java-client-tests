@@ -1,9 +1,8 @@
 package com.jaspersoft.jasperserver.jaxrs.client.apiadapters.jobs.calendar;
 
+import com.jaspersoft.jasperserver.dto.job.ClientJobCalendar;
 import com.jaspersoft.jasperserver.jaxrs.client.RestClientTestUtil;
 import com.jaspersoft.jasperserver.jaxrs.client.core.operationresult.OperationResult;
-import com.jaspersoft.jasperserver.dto.job.ClientJobCalendar;
-import com.jaspersoft.jasperserver.jaxrs.client.dto.jobs.calendar.WeeklyCalendar;
 import java.util.TimeZone;
 import javax.ws.rs.core.Response;
 import org.testng.annotations.AfterClass;
@@ -29,8 +28,9 @@ public class WeeklyCalendarTest extends RestClientTestUtil {
     @Test
     public void should_create_calendar() {
         // Given
-        WeeklyCalendar calendar = new WeeklyCalendar();
+        ClientJobCalendar calendar = new ClientJobCalendar();
 
+        calendar.setCalendarType(ClientJobCalendar.Type.weekly);
         calendar.setDescription("ACalendarForTheTestPurposes");
         calendar.setTimeZone(TimeZone.getTimeZone("GMT+03:00"));
         calendar.setExcludeDaysFlags(new boolean[]{

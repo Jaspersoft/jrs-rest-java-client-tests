@@ -1,22 +1,24 @@
     package com.jaspersoft.jasperserver.jaxrs.client.apiadapters.reporting;
 
-import com.jaspersoft.jasperserver.dto.reports.ReportParameter;
-import com.jaspersoft.jasperserver.dto.reports.ReportParameters;
-import com.jaspersoft.jasperserver.jaxrs.client.RestClientTestUtil;
-import com.jaspersoft.jasperserver.jaxrs.client.core.operationresult.OperationResult;
-import com.jaspersoft.jasperserver.jaxrs.client.dto.reports.ExportDescriptor;
-import com.jaspersoft.jasperserver.jaxrs.client.dto.reports.ReportExecutionDescriptor;
-import com.jaspersoft.jasperserver.jaxrs.client.dto.reports.ReportExecutionRequest;
-import java.io.InputStream;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.TimeZone;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
+    import com.jaspersoft.jasperserver.dto.reports.ReportParameter;
+    import com.jaspersoft.jasperserver.dto.reports.ReportParameters;
+    import com.jaspersoft.jasperserver.jaxrs.client.RestClientTestUtil;
+    import com.jaspersoft.jasperserver.jaxrs.client.core.operationresult.OperationResult;
+    import com.jaspersoft.jasperserver.jaxrs.client.dto.reports.ExportDescriptor;
+    import com.jaspersoft.jasperserver.jaxrs.client.dto.reports.ExportExecutionDescriptor;
+    import com.jaspersoft.jasperserver.jaxrs.client.dto.reports.ExportExecutionOptions;
+    import com.jaspersoft.jasperserver.jaxrs.client.dto.reports.ReportExecutionDescriptor;
+    import com.jaspersoft.jasperserver.jaxrs.client.dto.reports.ReportExecutionRequest;
+    import java.io.InputStream;
+    import java.util.LinkedList;
+    import java.util.List;
+    import java.util.TimeZone;
+    import org.testng.annotations.AfterClass;
+    import org.testng.annotations.BeforeClass;
+    import org.testng.annotations.Test;
 
-import static java.util.Arrays.asList;
-import static org.testng.AssertJUnit.assertNotNull;
+    import static java.util.Arrays.asList;
+    import static org.testng.AssertJUnit.assertNotNull;
 
 
 /**
@@ -295,6 +297,37 @@ public class ReportingServiceTest extends RestClientTestUtil {
         ReportExecutionDescriptor reportExecutionDescriptor = operationResult.getEntity();
         // Then
         assertNotNull(reportExecutionDescriptor);
+    }
+
+    @Test
+    public void should_return_proper_entity_in_async_mode_if_format_is_string_with_executionOptions() {
+
+        // When
+        ReportExecutionRequest request = new ReportExecutionRequest();
+        request.setReportUnitUri(reportUnitUri);
+        request
+                .setAsync(true)
+                .setOutputFormat("pdf");
+
+        OperationResult<ReportExecutionDescriptor> operationResult = session
+                .reportingService()
+                .newReportExecutionRequest(request);
+
+        final String requestId = operationResult.getEntity().getRequestId();
+
+        ExportExecutionOptions exportExecutionOptions = new ExportExecutionOptions()
+                .setOutputFormat(ReportOutputFormat.HTML)
+                .setPages("10000-20000");
+
+        final OperationResult<ExportExecutionDescriptor> executionDescriptorOperationResult = session
+                .reportingService()
+                .reportExecutionRequest(requestId)
+                .runExport(exportExecutionOptions);
+
+        final ExportExecutionDescriptor executionDescriptor = executionDescriptorOperationResult.getEntity();
+
+        // Then
+        assertNotNull(executionDescriptor);
     }
 
     @Test

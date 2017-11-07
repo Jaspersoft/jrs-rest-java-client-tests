@@ -202,10 +202,10 @@ public class QueryExecutionServiceTest extends RestClientTestUtil {
     public void should_delete_query_execution() throws ParseException {
 
         // When
-        OperationResult<? extends ClientQueryResultData> execute = session.
+        OperationResult execute = session.
                 queryExecutionService().
-                providedQuery().
-                deleteExecution(uuId);
+                execution(uuId).
+                delete();
 
         // Then
         assertEquals(Response.Status.NO_CONTENT.getStatusCode(), execute.getResponse().getStatus());

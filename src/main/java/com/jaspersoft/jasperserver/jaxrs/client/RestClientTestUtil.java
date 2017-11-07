@@ -3,13 +3,17 @@ package com.jaspersoft.jasperserver.jaxrs.client;
 import com.jaspersoft.jasperserver.jaxrs.client.core.JasperserverRestClient;
 import com.jaspersoft.jasperserver.jaxrs.client.core.RestClientConfiguration;
 import com.jaspersoft.jasperserver.jaxrs.client.core.Session;
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.util.Locale;
 import java.util.Properties;
 import java.util.TimeZone;
+import javax.xml.bind.DatatypeConverter;
+import org.apache.commons.io.FileUtils;
 
 /**
  * @author Tetiana Iefimenko
@@ -79,5 +83,28 @@ public abstract class RestClientTestUtil {
                 e.printStackTrace();
             }
         }
+    }
+
+    protected static String fileToString(File file) {
+        String str = null;
+        try {
+            str = FileUtils.readFileToString(file, "UTF-8");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return str;
+    }
+
+    protected static String fileToStringBase64Encoded(File file) {
+        String str = null;
+        try {
+            str = FileUtils.readFileToString(file, "UTF-8");
+            str = DatatypeConverter.printBase64Binary(str.getBytes("UTF-8"));
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return str;
     }
 }

@@ -64,6 +64,42 @@ public class ResourcesSematicLayerDataSourceServiceTest extends RestClientTestUt
         assertEquals(domainNew.getDescription(), "testDescription");
 
     }
+
+    @Test
+    public void should_upload_semanticLayerDataSource_with_schema_bundles() throws FileNotFoundException {
+        OperationResult<ClientSemanticLayerDataSource> operationResult = session
+                .resourcesService()
+                .resource(testDomainUri)
+                .get(ClientSemanticLayerDataSource.class);
+        final ClientSemanticLayerDataSource domain = operationResult.getEntity();
+
+        InputStream schemaXmlResult = session
+                .resourcesService()
+                .resource(domain.getSchema().getUri())
+                .downloadBinary()
+                .getEntity();
+
+        OperationResult<ClientSemanticLayerDataSource> resDomain =
+                session.resourcesService()
+                        .semanticLayerDataSourceResource()
+                        .withDataSource(new ClientReference().setUri(domain.getDataSource().getUri()))
+                        .withSchema(schemaXmlResult, "schema.xml", "schema")
+                        .withLabel("testDomain")
+                        .withDescription("testDescription")
+                        .inFolder("/public")
+                        .create();
+
+        OperationResult<ClientSemanticLayerDataSource> operationResult1 = session
+                .resourcesService()
+                .resource("/public/testDomain")
+                .get(ClientSemanticLayerDataSource.class);
+        final ClientSemanticLayerDataSource domainNew = operationResult1.getEntity();
+
+        assertNotNull(domainNew);
+        assertEquals(domainNew.getLabel(), "testDomain");
+        assertEquals(domainNew.getDescription(), "testDescription");
+
+    }
     @Test
     public void should_upload_semanticLayerDataSource_with_resourceDescriptor() throws FileNotFoundException {
         OperationResult<ClientSemanticLayerDataSource> operationResult = session

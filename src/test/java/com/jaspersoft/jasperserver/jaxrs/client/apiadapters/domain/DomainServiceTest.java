@@ -8,7 +8,7 @@ import com.jaspersoft.jasperserver.dto.resources.ResourceMediaType;
 import com.jaspersoft.jasperserver.dto.resources.domain.ClientDomain;
 import com.jaspersoft.jasperserver.jaxrs.client.RestClientTestUtil;
 import com.jaspersoft.jasperserver.jaxrs.client.apiadapters.importexport.importservice.ImportParameter;
-import com.jaspersoft.jasperserver.jaxrs.client.apiadapters.resources.ResourceSearchParameter;
+import com.jaspersoft.jasperserver.jaxrs.client.apiadapters.resources.util.ResourceSearchParameter;
 import com.jaspersoft.jasperserver.jaxrs.client.core.exceptions.JSClientWebException;
 import com.jaspersoft.jasperserver.jaxrs.client.core.operationresult.OperationResult;
 import com.jaspersoft.jasperserver.dto.importexport.State;
@@ -229,7 +229,7 @@ public class DomainServiceTest extends RestClientTestUtil {
                 .setDescription("Test folder")
                 .setVersion(0);
 
-        OperationResult<ClientResource> operationResult = session
+        OperationResult<? extends ClientResource> operationResult = session
                 .resourcesService()
                 .resource(folder.getUri())
                 .createOrUpdate(folder);

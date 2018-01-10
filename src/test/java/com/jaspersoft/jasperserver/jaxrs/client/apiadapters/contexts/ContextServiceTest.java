@@ -163,6 +163,54 @@ public class ContextServiceTest extends RestClientTestUtil {
 
     }
 
+    @Test
+    public void should_create_context_get_metadata_with_parameter_includes_for_mongoDb_jdbc() {
+        OperationResult<ClientResourceLookup> operationResult = session
+                .contextService()
+                .context(ClientResourceLookup.class, "application/repository.resourceLookup+json")
+                .create(new ClientResourceLookup().setUri("/public/MongoDB_JDBC_Data_Source_1"));
+
+        extractUuid(operationResult.getResponse().getHeaderString("Location"));
+        OperationResult<PresentationGroupElement> operationResult2 = session
+                .contextService()
+                .context(uuId,
+                        PresentationGroupElement.class,
+                        "application/contexts.partialMetadataOptions+json")
+                .addParameter("includes", (String) null)
+                .partialMetadata();
+
+        assertNotNull(operationResult);
+        assertEquals(Response.Status.OK.getStatusCode(), operationResult.getResponse().getStatus());
+
+        extractUuid(operationResult.getResponse().getHeaderString("Location"));
+        assertNotNull(uuId);
+
+    }
+
+    @Test
+    public void should_create_context_get_metadata_with_parameter_includes() {
+        OperationResult<ClientResourceLookup> operationResult = session
+                .contextService()
+                .context(ClientResourceLookup.class, "application/repository.resourceLookup+json")
+                .create(new ClientResourceLookup().setUri("/public/Samples/Data_Sources/FoodmartDataSource"));
+
+        extractUuid(operationResult.getResponse().getHeaderString("Location"));
+        OperationResult<PresentationGroupElement> operationResult2 = session
+                .contextService()
+                .context(uuId,
+                        PresentationGroupElement.class,
+                        "application/contexts.partialMetadataOptions+json")
+                .addParameter("includes", (String) null)
+                .partialMetadata();
+
+        assertNotNull(operationResult);
+        assertEquals(Response.Status.OK.getStatusCode(), operationResult.getResponse().getStatus());
+
+        extractUuid(operationResult.getResponse().getHeaderString("Location"));
+        assertNotNull(uuId);
+
+    }
+
     private void extractUuid(String locationHeader) {
         if (locationHeader.endsWith("metadata")) {
             locationHeader = locationHeader.substring(0, locationHeader.lastIndexOf("/"));

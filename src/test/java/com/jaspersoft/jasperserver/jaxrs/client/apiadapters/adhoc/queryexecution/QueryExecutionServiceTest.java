@@ -3,10 +3,6 @@ package com.jaspersoft.jasperserver.jaxrs.client.apiadapters.adhoc.queryexecutio
 import com.jaspersoft.jasperserver.dto.adhoc.datasource.ClientDataSourceField;
 import com.jaspersoft.jasperserver.dto.adhoc.query.ClientMultiAxisQuery;
 import com.jaspersoft.jasperserver.dto.adhoc.query.ClientMultiLevelQuery;
-import com.jaspersoft.jasperserver.dto.adhoc.query.ClientWhere;
-import com.jaspersoft.jasperserver.dto.adhoc.query.el.ClientVariable;
-import com.jaspersoft.jasperserver.dto.adhoc.query.el.literal.ClientString;
-import com.jaspersoft.jasperserver.dto.adhoc.query.el.operator.comparison.ClientEquals;
 import com.jaspersoft.jasperserver.dto.adhoc.query.field.ClientQueryAggregatedField;
 import com.jaspersoft.jasperserver.dto.adhoc.query.field.ClientQueryField;
 import com.jaspersoft.jasperserver.dto.adhoc.query.field.ClientQueryLevel;
@@ -18,11 +14,9 @@ import com.jaspersoft.jasperserver.dto.adhoc.query.select.ClientSelect;
 import com.jaspersoft.jasperserver.dto.executions.ClientFlatQueryResultData;
 import com.jaspersoft.jasperserver.dto.executions.ClientMultiAxesQueryExecution;
 import com.jaspersoft.jasperserver.dto.executions.ClientMultiLevelQueryExecution;
-import com.jaspersoft.jasperserver.dto.executions.ClientMultiLevelQueryResultData;
 import com.jaspersoft.jasperserver.dto.executions.ClientProvidedQueryExecution;
 import com.jaspersoft.jasperserver.dto.executions.ClientQueryParams;
 import com.jaspersoft.jasperserver.dto.executions.ClientQueryResultData;
-import com.jaspersoft.jasperserver.dto.executions.QueryResultDataMediaType;
 import com.jaspersoft.jasperserver.jaxrs.client.RestClientTestUtil;
 import com.jaspersoft.jasperserver.jaxrs.client.core.operationresult.OperationResult;
 import java.text.ParseException;
@@ -34,7 +28,7 @@ import org.testng.annotations.Test;
 
 import static java.util.Arrays.asList;
 import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertNotNull;
+import static org.testng.AssertJUnit.assertNotNull;
 
 /**
  * <p/>
@@ -80,82 +74,6 @@ public class QueryExecutionServiceTest extends RestClientTestUtil {
         assertEquals(Response.Status.OK.getStatusCode(), execute.getResponse().getStatus());
         assertNotNull(execute);
         assertNotNull(execute.getEntity());
-    }
-
-
-    @Test(enabled = true)
-    public void should_get_multi_level_data_result_set() throws ParseException {
-        // Given
-        LinkedList<ClientQueryField> fields = new LinkedList<ClientQueryField>();
-        fields.add(new ClientQueryField().setId("city1").
-                setDataSourceField(new ClientDataSourceField().
-                        setName("sales_fact_ALL.sales__store.sales__store__region.sales__store__region__sales_city").
-                        setType("String")));
-
-        ClientEquals clientEquals = new ClientEquals();
-        clientEquals.
-                getOperands().add(new ClientVariable("city1"));
-        clientEquals.
-                getOperands().add(new ClientString("San Francisco"));
-
-        ClientWhere where = new ClientWhere().setFilterExpressionObject(clientEquals);
-
-        ClientMultiLevelQuery query = (ClientMultiLevelQuery) new ClientMultiLevelQuery().
-                setSelect(new ClientSelect().setFields(fields)).
-                setWhere(where).setLimit(1000);
-
-        ClientMultiLevelQueryExecution queryExecution = new ClientMultiLevelQueryExecution().
-                setDataSourceUri("/public/Samples/Ad_Hoc_Views/04__Product_Results_by_Store_Type").
-                setQuery(query).
-                setParams(new ClientQueryParams().setOffset(new int[]{0}).setPageSize(new int[]{100}));
-
-        // When
-        OperationResult<ClientMultiLevelQueryResultData> execute = session.
-                queryExecutionService().
-                multiLevelQuery().
-                execute(queryExecution);
-
-        // Then
-        assertEquals(Response.Status.OK.getStatusCode(), execute.getResponse().getStatus());
-        assertNotNull(execute);
-    }
-
-    @Test(enabled = true)
-    public void should_get_multi_level_data_result_set_as_flat_data() throws ParseException {
-        // Given
-        LinkedList<ClientQueryField> fields = new LinkedList<ClientQueryField>();
-        fields.add(new ClientQueryField().setId("city1").
-                setDataSourceField(new ClientDataSourceField().
-                        setName("sales_fact_ALL.sales__store.sales__store__region.sales__store__region__sales_city").
-                        setType("String")));
-
-        ClientEquals clientEquals = new ClientEquals();
-        clientEquals.
-                getOperands().add(new ClientVariable("city1"));
-        clientEquals.
-                getOperands().add(new ClientString("San Francisco"));
-
-        ClientWhere where = new ClientWhere().setFilterExpressionObject(clientEquals);
-
-        ClientMultiLevelQuery query = (ClientMultiLevelQuery) new ClientMultiLevelQuery().
-                setSelect(new ClientSelect().setFields(fields)).
-                setWhere(where).setLimit(1000);
-
-        ClientMultiLevelQueryExecution queryExecution = new ClientMultiLevelQueryExecution().
-                setDataSourceUri("/public/Samples/Ad_Hoc_Views/04__Product_Results_by_Store_Type").
-                setQuery(query).
-                setParams(new ClientQueryParams().setOffset(new int[]{0}).setPageSize(new int[]{100}));
-
-        // When
-        OperationResult<ClientFlatQueryResultData> execute = session.
-                queryExecutionService().
-                multiLevelQuery().
-                asResultDataSet(QueryResultDataMediaType.FLAT_DATA_JSON).
-                execute(queryExecution);
-
-        // Then
-        assertEquals(Response.Status.OK.getStatusCode(), execute.getResponse().getStatus());
-        assertNotNull(execute);
     }
 
     @Test(enabled = true)
@@ -220,7 +138,7 @@ public class QueryExecutionServiceTest extends RestClientTestUtil {
         LinkedList<ClientQueryAggregatedField> aggregations = new LinkedList<ClientQueryAggregatedField>();
         aggregations.add(new ClientQueryAggregatedField().
                 setId("Sumsales1").
-                setAggregateExpression("Sum(sales1)").
+                setAggregateFirstLevelExpression("Sum(sales1)").
                 setDataSourceField(new ClientDataSourceField().
                         setName("sales_fact_ALL.sales_fact_ALL__store_sales_2013").
                         setType("java.lang.Double")));

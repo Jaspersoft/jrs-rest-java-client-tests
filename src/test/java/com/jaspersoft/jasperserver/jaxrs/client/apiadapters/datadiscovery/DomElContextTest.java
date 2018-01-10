@@ -51,14 +51,12 @@ public class DomElContextTest extends RestClientTestUtil {
         expressionConstant = new DomElExpressionContext().
                 setExpression(new ClientExpressionContainer().setString("constant == '21:12:36'")).
                 setVariables(asList(new DomElVariable().setName("constant").setType("java.sql.Time"))).
-                setResultType("java.lang.Boolean").
-                setSkipTypeAndFunctionsValidation(Boolean.TRUE);
+                setResultType("java.lang.Boolean");
 
         expressionConstant1 = new DomElExpressionContext().
                 setExpression(new ClientExpressionContainer().setString("anotherConstant == 'olala'")).
                 setVariables(asList(new DomElVariable().setName("anotherConstant").setType("java.lang.String"))).
-                setResultType("java.lang.Boolean").
-                setSkipTypeAndFunctionsValidation(Boolean.TRUE);
+                setResultType("java.lang.Boolean");
     }
 
     @AfterClass

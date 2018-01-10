@@ -5,7 +5,6 @@ import com.jaspersoft.jasperserver.dto.resources.ClientJndiJdbcDataSource;
 import com.jaspersoft.jasperserver.dto.resources.ClientReference;
 import com.jaspersoft.jasperserver.dto.resources.ClientReferenceableFile;
 import com.jaspersoft.jasperserver.dto.resources.ClientReportUnit;
-import com.jaspersoft.jasperserver.dto.resources.domain.ClientDomain;
 import com.jaspersoft.jasperserver.jaxrs.client.RestClientTestUtil;
 import com.jaspersoft.jasperserver.jaxrs.client.core.operationresult.OperationResult;
 import java.io.File;
@@ -24,10 +23,6 @@ import static org.testng.Assert.assertNotNull;
  */
 public class ResourcesReportUnitServiceTest extends RestClientTestUtil {
 
-    private ClientDomain testDomain;
-    private String testDomainUri = "/public/Samples/Domains/supermartDomain";
-    private String testResourceUri = "";
-
     @BeforeClass
     public void before() {
         initClient();
@@ -41,6 +36,7 @@ public class ResourcesReportUnitServiceTest extends RestClientTestUtil {
                 session.resourcesService()
                         .reportUnitResource()
                         .withJrxml(new FileInputStream("report_upload_resources\\AllAccounts.jrxml"), "AllAccounts.jrxml", "jrxml file")
+                        .withDataSource("/public/Samples/Data_Sources/JServerJNDIDS")
                         .withLabel("testReport")
                         .withDescription("testDescription")
                         .inFolder("/public")
@@ -58,6 +54,25 @@ public class ResourcesReportUnitServiceTest extends RestClientTestUtil {
                         .withJrxml(new FileInputStream("report_upload_resources\\AllAccounts.jrxml"), "AllAccounts.jrxml", "jrxml file")
                         .withFile(new ClientReference().setUri("/public/Samples/Resources/Images/Jaspersoft_logo.png"), "Jaspersoft_logo.png")
                         .withFile(new ClientReference().setUri("/organizations/organization_1/images/JRLogo"), "JRLogo")
+                        .withDataSource("/public/Samples/Data_Sources/JServerJNDIDS")
+                        .withLabel("testReport")
+                        .withDescription("testDescription")
+                        .inFolder("/public")
+                        .create();
+
+        assertNotNull(repUnut);
+    }
+
+    @Test
+    public void should_upload_reportUnit_with_Images_loaded_from_local_system() throws FileNotFoundException {
+
+        OperationResult<ClientReportUnit> repUnut =
+                session.resourcesService()
+                        .reportUnitResource()
+                        .withJrxml(new FileInputStream("report_upload_resources\\AllAccounts.jrxml"), "AllAccounts.jrxml", "jrxml file")
+                        .withFile(new File("report_upload_resources/Jaspersoft_logo.png"), "Jaspersoft_logo.png", "image", ClientFile.FileType.img)
+                        .withFile(new File("report_upload_resources/JRLogo"), "JRLogo", "image", ClientFile.FileType.img)
+                        .withDataSource("/public/Samples/Data_Sources/JServerJNDIDS")
                         .withLabel("testReport")
                         .withDescription("testDescription")
                         .inFolder("/public")
@@ -70,7 +85,8 @@ public class ResourcesReportUnitServiceTest extends RestClientTestUtil {
     public void should_upload_reportUnit_with_Image_as_resource_descriptor() throws FileNotFoundException {
         final ClientReportUnit clientReportUnit = new ClientReportUnit()
                 .setLabel("testReport")
-                .setDescription("testDescription");
+                .setDescription("testDescription")
+                .setDataSource(new ClientReference().setUri("/public/Samples/Data_Sources/JServerJNDIDS"));
         clientReportUnit.setFiles(new HashMap<String, ClientReferenceableFile>());
         clientReportUnit.getFiles().put("JRLogo", new ClientFile()
                 .setUri("/organizations/organization_1/images/JRLogo")
@@ -95,7 +111,7 @@ public class ResourcesReportUnitServiceTest extends RestClientTestUtil {
     }
 
     @Deprecated
-    @Test
+    @Test(enabled = false)
     public void should_upload_report_with_jrxml() throws FileNotFoundException {
         ClientReferenceableFile jrxml = new ClientReferenceableFile() {
             @Override
@@ -127,7 +143,7 @@ public class ResourcesReportUnitServiceTest extends RestClientTestUtil {
 
 
     @Deprecated
-    @Test
+    @Test(enabled = false)
     public void should_upload_report_with_jrxml_with_image() throws FileNotFoundException {
         ClientReferenceableFile jrxml = new ClientReferenceableFile() {
             @Override

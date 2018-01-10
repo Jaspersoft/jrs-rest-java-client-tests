@@ -195,6 +195,25 @@ public class PermissionsServiceTest extends RestClientTestUtil {
 
     }
 
+    @Test
+    public void should_createOrUpdate_permission() {
+
+        RepositoryPermission permission = new RepositoryPermission()
+                .setMask(6);
+        OperationResult result = session
+                .permissionsService()
+                .forResource("/public/testPermission")
+                .permission()
+                .permissionRecipient(PermissionRecipient.ROLE, "ROLE_USER")
+                .createOrUpdate(permission);
+
+        assertNotNull(result);
+        assertEquals(result.getResponse().getStatus(), 200);
+
+    }
+
+
+
 
     @AfterClass
     public void after() {

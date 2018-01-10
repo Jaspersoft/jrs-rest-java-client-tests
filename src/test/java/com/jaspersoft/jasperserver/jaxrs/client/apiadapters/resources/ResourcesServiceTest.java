@@ -2,11 +2,13 @@ package com.jaspersoft.jasperserver.jaxrs.client.apiadapters.resources;
 
 import com.jaspersoft.jasperserver.dto.common.PatchDescriptor;
 import com.jaspersoft.jasperserver.dto.common.PatchItem;
+import com.jaspersoft.jasperserver.dto.reports.ReportParameter;
 import com.jaspersoft.jasperserver.dto.resources.ClientFile;
 import com.jaspersoft.jasperserver.dto.resources.ClientFolder;
 import com.jaspersoft.jasperserver.dto.resources.ClientJndiJdbcDataSource;
 import com.jaspersoft.jasperserver.dto.resources.ClientReference;
 import com.jaspersoft.jasperserver.dto.resources.ClientReferenceableFile;
+import com.jaspersoft.jasperserver.dto.resources.ClientReportOptions;
 import com.jaspersoft.jasperserver.dto.resources.ClientReportUnit;
 import com.jaspersoft.jasperserver.dto.resources.ClientResource;
 import com.jaspersoft.jasperserver.dto.resources.ClientResourceListWrapper;
@@ -26,12 +28,14 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.Response;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import static java.util.Arrays.asList;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertTrue;
@@ -43,8 +47,11 @@ import static org.testng.Assert.assertTrue;
 public class ResourcesServiceTest extends RestClientTestUtil {
 
     public static final String NEW_TEST_DESCRIPTION = "new test description";
+    private static final String TEST_PARENT_FOLDER = "/public";
+    private static final String TEST_RESOURCE_FOLDER = "/public/testFolder";
+    private static final String TEST_FILE_RESOURCE_URI = "/public/testFolder/testImage.jpg";
     private ClientDomain testDomain;
-    private String testDomainUri = "/public/Samples/Domains/supermartDomain";
+    private static final String TEST_DOMAIN_URI = "/organizations/organization_1/Domains/Simple_Domain";
     private String testResourceUri = "";
     private static ClientFile fileAsStrreamUploaded;
     private ClientFile fileAsBase64Uploaded;
@@ -54,6 +61,17 @@ public class ResourcesServiceTest extends RestClientTestUtil {
     public void before() {
         initClient();
         initSession();
+        ClientFolder folder = new ClientFolder();
+        folder
+                .setLabel("testFolder")
+                .setDescription("Test folder");
+
+        final OperationResult<? extends ClientResource> operationResult = session
+                .resourcesService()
+                .resource(folder)
+                .inFolder(TEST_PARENT_FOLDER)
+                .create();
+
     }
 
 // GET section
@@ -64,7 +82,7 @@ public class ResourcesServiceTest extends RestClientTestUtil {
         // When
         OperationResult<ClientDomain> result = session
                 .resourcesService()
-                .resource(testDomainUri)
+                .resource(TEST_DOMAIN_URI)
                 .detailsForType(ClientDomain.class);
 
         Assert.assertNotNull(result);
@@ -111,7 +129,7 @@ public class ResourcesServiceTest extends RestClientTestUtil {
         OperationResult<ClientResourceListWrapper> result = session
                 .resourcesService()
                 .resources()
-                .parameter(ResourceSearchParameter.FOLDER_URI, "/public")
+                .parameter(ResourceSearchParameter.FOLDER_URI, TEST_PARENT_FOLDER)
                 .parameter(ResourceSearchParameter.LIMIT, "10")
                 .search();
         ClientResourceListWrapper resourceListWrapper = result.getEntity();
@@ -126,10 +144,9 @@ public class ResourcesServiceTest extends RestClientTestUtil {
     public void should_return_domain_as_resource_client_domain() {
 
         // When
-        testDomainUri = "/public/Samples/Domains/supermartDomain";
         OperationResult<ClientDomain> result = session
                 .resourcesService()
-                .resource(testDomainUri)
+                .resource(TEST_DOMAIN_URI)
                 .detailsForType(ClientDomain.class);
 
         // Then
@@ -143,7 +160,7 @@ public class ResourcesServiceTest extends RestClientTestUtil {
         // When
         OperationResult<ClientSemanticLayerDataSource> result = session
                 .resourcesService()
-                .resource("/public/Samples/Domains/supermartDomain")
+                .resource(TEST_DOMAIN_URI)
                 .detailsForType(ClientSemanticLayerDataSource.class);
 
         // Then
@@ -176,7 +193,7 @@ public class ResourcesServiceTest extends RestClientTestUtil {
 
         // When
         ClientResource clientResource = session.resourcesService()
-                .resource("/organizations/organization_1/Domains/Simple_Domain")
+                .resource(TEST_DOMAIN_URI)
                 .details()
                 .getEntity();
 
@@ -189,7 +206,7 @@ public class ResourcesServiceTest extends RestClientTestUtil {
 
         // When
         ClientResource clientResource = session.resourcesService()
-                .resource("/public")
+                .resource(TEST_PARENT_FOLDER)
                 .details()
                 .getEntity();
 
@@ -204,7 +221,7 @@ public class ResourcesServiceTest extends RestClientTestUtil {
         // When
         OperationResult<ClientSemanticLayerDataSource> operationResult = session
                 .resourcesService()
-                .resource("/public/Samples/Domains/supermartDomain")
+                .resource(TEST_DOMAIN_URI)
                 .detailsForType(ClientSemanticLayerDataSource.class);
         final ClientSemanticLayerDataSource domain = operationResult.getEntity();
 
@@ -218,11 +235,11 @@ public class ResourcesServiceTest extends RestClientTestUtil {
     }
 
 
-    @Test(dependsOnMethods = "should_create_image_as_file_resource_with_stream")
+    @Test
     public void should_return_resource_file_details() throws InterruptedException {
         // When
         ClientResource clientResource = session.resourcesService()
-                .resource("/public/testImage.gpg")
+                .resource(TEST_RESOURCE_FOLDER)
                 .details()
                 .getEntity();
 
@@ -240,10 +257,10 @@ public class ResourcesServiceTest extends RestClientTestUtil {
                 .setLabel("testFolder")
                 .setDescription("Test folder");
 
-        final OperationResult<ClientResource> operationResult = session
+        final OperationResult<? extends ClientResource> operationResult = session
                 .resourcesService()
                 .resource(folder)
-                .inFolder("/public")
+                .inFolder(TEST_RESOURCE_FOLDER)
                 .create();
 
         final ClientResource entity = operationResult.getEntity();
@@ -253,12 +270,12 @@ public class ResourcesServiceTest extends RestClientTestUtil {
     public void should_create_folder_as_resource_with_descriptor_put() {
         ClientFolder folder = new ClientFolder();
         folder
-                .setUri("/public/testFolder1")
+                .setUri("/public/testFolder/testFolder1")
                 .setLabel("testFolder1")
                 .setDescription("Test folder")
                 .setVersion(-1);
 
-        final OperationResult<ClientResource> operationResult = session
+        final OperationResult<? extends  ClientResource> operationResult = session
                 .resourcesService()
                 .resource(folder.getUri())
                 .createOrUpdate(folder);
@@ -273,11 +290,11 @@ public class ResourcesServiceTest extends RestClientTestUtil {
         // When
         testDomain.setSecurityFile(null);
         testDomain.setBundles(null);
-        OperationResult<ClientResource> result = session
+        OperationResult<? extends  ClientResource> result = session
                 .resourcesService()
                 .resource(testDomain)
                 .parameter(com.jaspersoft.jasperserver.jaxrs.client.apiadapters.resources.util.ResourceServiceParameter.CREATE_FOLDERS, true)
-                .inFolder("/public")
+                .inFolder(TEST_RESOURCE_FOLDER)
                 .create();
 
         // Then
@@ -298,8 +315,8 @@ public class ResourcesServiceTest extends RestClientTestUtil {
                                 .setDescription("test description")
                                 .setType(ClientFile.FileType.img))
                 .asInputStream()
-                .toFolder("/public")
-                .upload();
+                .inFolder(TEST_RESOURCE_FOLDER)
+                .create();
 
         // Then
 
@@ -322,8 +339,8 @@ public class ResourcesServiceTest extends RestClientTestUtil {
                 .fileResource(new FileInputStream("D:\\workspaceIdea\\jrs-rest-java-client-tests\\image.jpeg"),
                         resourceDescriptor)
                 .asBase64EncodedContent()
-                .toFolder("/public")
-                .upload();
+                .inFolder(TEST_RESOURCE_FOLDER)
+                .create();
 
         // Then
         assertNotNull(result.getEntity());
@@ -335,16 +352,16 @@ public class ResourcesServiceTest extends RestClientTestUtil {
 
         // When
         final ClientFile resourceDescriptor = new ClientFile()
-                .setLabel("testImage2.jpg")
-                .setDescription("test description")
-                .setType(ClientFile.FileType.img);
+                .setLabel("test_overrides_custom.css")
+//                .setDescription("test description")
+                .setType(ClientFile.FileType.css);
         OperationResult<ClientFile> result = session
                 .resourcesService()
-                .fileResource(new FileInputStream("D:\\workspaceIdea\\jrs-rest-java-client-tests\\image.jpeg"),
+                .fileResource(new FileInputStream("D:\\workspaceIdea\\jrs-rest-java-client-tests\\overrides_custom.css"),
                         resourceDescriptor)
                 .asMultipartForm()
-                .toFolder("/public")
-                .upload();
+                .inFolder(TEST_RESOURCE_FOLDER)
+                .create();
 
         // Then
         assertNotNull(result.getEntity());
@@ -366,16 +383,16 @@ public class ResourcesServiceTest extends RestClientTestUtil {
                                     .setDescription("test description")
                                     .setType(ClientFile.FileType.img))
                     .asMultipartForm()
-                    .toFolder("/public")
+                    .inFolder(TEST_RESOURCE_FOLDER)
                     .withName("testImageName")
-                    .upload();
+                    .create();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
 
         // Then
         assertNotNull(result.getEntity());
-        assertEquals(result.getEntity().getUri(), "/public/testImageName");
+        assertEquals(result.getEntity().getUri(), TEST_RESOURCE_FOLDER + "/testImageName/testImage2.jpg");
     }
 
 
@@ -385,7 +402,7 @@ public class ResourcesServiceTest extends RestClientTestUtil {
     public void should_update_domain_as_file_resource_with_descriptor() {
         // When
 
-        OperationResult<ClientResource> result = session
+        OperationResult<? extends  ClientResource> result = session
                 .resourcesService()
                 .resource(testResourceUri)
                 .createOrUpdate(testDomain.setLabel("New test label").setDescription("new test description"));
@@ -396,14 +413,15 @@ public class ResourcesServiceTest extends RestClientTestUtil {
         assertEquals(result.getEntity().getLabel(), "New test label");
     }
 
-    @Test(dependsOnMethods = "should_create_folder_as_resource_with_descriptor")
+    @Test(dependsOnMethods = "should_create_folder_as_resource_with_descriptor_post")
     public void should_copy_resource_to_folder() throws InterruptedException {
 
         // When
-        OperationResult<ClientResource> clientResource = session.resourcesService()
-                .resource(testDomainUri)
-                .toFolder("/public/testFolder")
+        OperationResult<? extends  ClientResource> clientResource = session.resourcesService()
+                .resource(TEST_DOMAIN_URI)
+                .inFolder(TEST_RESOURCE_FOLDER + "_copy")
                 .parameter(ResourceServiceParameter.CREATE_FOLDERS, true)
+                .parameter(ResourceServiceParameter.OVERWRITE, true)
                 .copy();
 
         Assert.assertNotNull(clientResource);
@@ -413,9 +431,11 @@ public class ResourcesServiceTest extends RestClientTestUtil {
     public void should_move_resource_to_folder() throws InterruptedException {
 
         // When
-        OperationResult<ClientResource> clientResource = session.resourcesService()
-                .resource("/public/testImage.jpg")
-                .toFolder("/public/testFolder")
+        OperationResult<? extends  ClientResource> clientResource = session.resourcesService()
+                .resource(TEST_RESOURCE_FOLDER + "/testImage.jpg")
+                .inFolder(TEST_RESOURCE_FOLDER + "_move")
+                .parameter(ResourceServiceParameter.CREATE_FOLDERS, true)
+                .parameter(ResourceServiceParameter.OVERWRITE, true)
                 .move();
 
         Assert.assertNotNull(clientResource);
@@ -427,8 +447,8 @@ public class ResourcesServiceTest extends RestClientTestUtil {
     public void should_update_folder_with_stream() {
         final ClientFolder folder = session
                 .resourcesService()
-                .resource("/public/testFolder1")
-                .get(ClientFolder.class)
+                .resource(TEST_RESOURCE_FOLDER + "/testFolder1")
+                .detailsForType(ClientFolder.class)
                 .getEntity();
         final ArrayList<PatchItem> patchItems = new ArrayList<PatchItem>() {{
             add(new PatchItem().setField("label").setValue(folder.getLabel() + "_new"));
@@ -513,8 +533,9 @@ fileAsMultipartUploaded.setDescription(NEW_TEST_DESCRIPTION);
         // When
         Response resp = session.resourcesService()
                 .resources()
-                .parameter(ResourceSearchParameter.RESOURCE_URI, "/public/testFolder/supermartDomain")
-                .parameter(ResourceSearchParameter.RESOURCE_URI, "/public/testFolder/testImage.jpg")
+                .parameter(ResourceSearchParameter.RESOURCE_URI, TEST_RESOURCE_FOLDER + "/testImage.jpg")
+                .parameter(ResourceSearchParameter.RESOURCE_URI, TEST_RESOURCE_FOLDER + "_copy")
+                .parameter(ResourceSearchParameter.RESOURCE_URI, TEST_RESOURCE_FOLDER + "_move")
                 .delete()
                 .getResponse();
 
@@ -530,7 +551,7 @@ fileAsMultipartUploaded.setDescription(NEW_TEST_DESCRIPTION);
 
         // When
         Response resp = session.resourcesService()
-                .resource("/public/testFolder")
+                .resource(TEST_RESOURCE_FOLDER)
                 .delete()
                 .getResponse();
 
@@ -542,7 +563,7 @@ fileAsMultipartUploaded.setDescription(NEW_TEST_DESCRIPTION);
     }
 
     @Deprecated
-    @Test
+    @Test(enabled = false)
     public void should_create_resource() {
         ClientFolder folder = new ClientFolder();
         folder
@@ -551,7 +572,7 @@ fileAsMultipartUploaded.setDescription(NEW_TEST_DESCRIPTION);
                 .setDescription("Test folder")
                 .setVersion(0);
 
-        final OperationResult<ClientResource> operationResult = session
+        final OperationResult<? extends  ClientResource> operationResult = session
                 .resourcesService()
                 .resource(folder)
                 .create();
@@ -561,7 +582,7 @@ fileAsMultipartUploaded.setDescription(NEW_TEST_DESCRIPTION);
     }
 
     @Deprecated
-    @Test
+    @Test(enabled = false)
     public void should_create_resource_as_binaryData() throws IOException {
 
         byte[] encoded = Files.readAllBytes(Paths.get("D:\\workspaceIdea\\jrs-rest-java-client-tests\\image1.jpeg"));
@@ -574,24 +595,47 @@ fileAsMultipartUploaded.setDescription(NEW_TEST_DESCRIPTION);
                 setDescription("testDescription").
                 setContent(content);
 
-        OperationResult<ClientResource> result = session
+        OperationResult<? extends  ClientResource> result = session
                 .resourcesService()
-                .resource("/public")
+                .resource(TEST_PARENT_FOLDER)
                 .createNew(file);
 
         assertNotNull(result);
     }
 
     @Deprecated
-    @Test
+    @Test(enabled = false)
     public void should_create_domain_as_resource() {
 
         // When
 
-        OperationResult<ClientResource> result = session
+        OperationResult<? extends  ClientResource> result = session
                 .resourcesService()
-                .resource("/public")
+                .resource(TEST_PARENT_FOLDER)
                 .createNew(testDomain);
+
+        // Then
+
+        assertNotNull(result.getEntity());
+    }
+    @Test
+    public void should_create_report_options_as_resource() {
+
+        // When
+        final MultivaluedHashMap<String, String> map = new MultivaluedHashMap<String, String>();
+        map.addAll("Country_multi_select", "Mexico");
+        map.addAll("Cascading_state_multi_select", "Guerrero", "Sinaloa");
+        map.addAll("Cascading_name_single_select", "Crow-Sims Construction Associates");
+        OperationResult<? extends  ClientResource> result = session
+                .resourcesService()
+                .resource(new ClientReportOptions()
+                        .setReportUri("organizations/organization_1/adhoc/topics/Cascading_multi_select_topic")
+                .setLabel("new OptionsLabel")
+                .setReportParameters(new ArrayList<ReportParameter>(){{
+                    add(new ReportParameter().setName("Country_multi_select").setValues(asList("Mexico")));
+                }}))
+                .inFolder("/public")
+                .create();
 
         // Then
 
@@ -599,7 +643,7 @@ fileAsMultipartUploaded.setDescription(NEW_TEST_DESCRIPTION);
     }
 
     @Deprecated
-    @Test
+    @Test(enabled = false)
     public void should_upload_resource_as_binaryData() throws IOException {
 
         byte[] encoded = Files.readAllBytes(Paths.get("D:\\workspaceIdea\\jrs-rest-java-client-tests\\image1.jpeg"));
@@ -607,39 +651,39 @@ fileAsMultipartUploaded.setDescription(NEW_TEST_DESCRIPTION);
 
         ClientFile file = new ClientFile();
         file.
-                setUri("/public").
+                setUri(TEST_PARENT_FOLDER).
                 setType(ClientFile.FileType.img).
                 setLabel("testFile").
                 setDescription("testDescription").
                 setContent(content);
 
-        OperationResult<ClientResource> result = session
+        OperationResult<? extends  ClientResource> result = session
                 .resourcesService()
-                .resource("/public")
+                .resource(TEST_PARENT_FOLDER)
                 .createNew(file);
 
         assertNotNull(result);
     }
 
     @Deprecated
-    @Test
+    @Test(enabled = false)
     public void should_upload_resource_as_multipart() throws FileNotFoundException {
 
         OperationResult<ClientFile> result = session
                 .resourcesService()
-                .resource("/public")
+                .resource(TEST_PARENT_FOLDER)
                 .uploadFile(new File("D:\\workspaceIdea\\jrs-rest-java-client-tests\\image1.jpeg"), ClientFile.FileType.img, "fileName", "fileDescription");
 
         assertNotNull(result);
     }
 
     @Deprecated
-    @Test
+    @Test(enabled = false)
     public void should_copy_resource() throws InterruptedException {
 
         // When
         ClientResource clientResource = session.resourcesService()
-                .resource("/public")
+                .resource(TEST_PARENT_FOLDER)
                 .copyFrom("/public/Samples/Ad_Hoc_Views/01__Geographic_Results_by_Segment")
                 .getEntity();
 
@@ -712,6 +756,10 @@ fileAsMultipartUploaded.setDescription(NEW_TEST_DESCRIPTION);
 
     @AfterClass
     public void after() {
+        final OperationResult operationResult = session
+                .resourcesService()
+                .resource(TEST_RESOURCE_FOLDER)
+                .delete();
         session.logout();
         session = null;
     }

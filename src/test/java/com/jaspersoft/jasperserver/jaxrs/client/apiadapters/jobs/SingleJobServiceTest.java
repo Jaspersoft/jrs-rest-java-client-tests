@@ -20,22 +20,101 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import static org.junit.Assert.assertNull;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
 
 /**
  * @author Tetiana Iefimenko
  */
-public class JobServiceTest extends RestClientTestUtil{
+public class SingleJobServiceTest extends RestClientTestUtil{
     private String reportUri;
+    private Long jobId;
+
     @BeforeClass
     public void before() {
         initClient();
         initSession();
         reportUri = "/organizations/organization_1/adhoc/topics/Cascading_multi_select_topic";
     }
-
     @Test
+    public void should_create_job() {
+        // Given
+        ClientReportJob job = prepareJob();
+
+        // When
+        OperationResult<ClientReportJob> result = session
+                .jobsService()
+                .job(job)
+                .create();
+
+        job = result.getEntity();
+        jobId = job.getId();
+
+        // Then
+        assertNotNull(job.getSource().getParameters());
+        assertEquals(new String[]{"USA"}, job.getSource().getParameters().get("Country_multi_select"));
+        assertEquals(new String[]{"Chin-Lovell Engineering Associates"}, job.getSource().getParameters().get("Cascading_name_single_select"));
+        assertEquals(new String[]{"DF", "Jalisco", "Mexico"}, job.getSource().getParameters().get("Cascading_state_multi_select"));
+    }
+
+    @Test(dependsOnMethods = "should_create_job")
+    public void should_get_job() {
+        // Given
+        ClientReportJob job = prepareJob();
+
+        // When
+        OperationResult<ClientReportJob> result = session
+                .jobsService()
+                .job(jobId)
+                .getJob();
+
+        job = result.getEntity();
+
+        // Then
+        assertNotNull(job.getSource().getParameters());
+        assertEquals(new String[]{"USA"}, job.getSource().getParameters().get("Country_multi_select"));
+        assertEquals(new String[]{"Chin-Lovell Engineering Associates"}, job.getSource().getParameters().get("Cascading_name_single_select"));
+        assertEquals(new String[]{"DF", "Jalisco", "Mexico"}, job.getSource().getParameters().get("Cascading_state_multi_select"));
+    }
+
+    @Test(dependsOnMethods = "should_get_job")
+    public void should_update_job() {
+        // Given
+        ClientReportJob job = prepareJob();
+        final String description = "new job test description";
+        final ClientReportJob newJob = job.setDescription(description);
+
+        // When
+        OperationResult<ClientReportJob> result = session
+                .jobsService()
+                .job(jobId)
+                .update(newJob);
+
+        job = result.getEntity();
+
+        // Then
+        assertNotNull(job);
+        assertEquals(job.getDescription(), description);
+    }
+
+    @Test(dependsOnMethods = "should_update_job")
+    public void should_delete_job() {
+        // Given
+
+        // When
+        OperationResult result = session
+                .jobsService()
+                .job(jobId)
+                .delete();
+
+
+        // Then
+        assertNull(result.getEntity());
+    }
+
+    @Deprecated
+    @Test(enabled = false)
     public void should_scheduled_report() {
         // Given
         ClientReportJob job = prepareJob();
@@ -53,8 +132,8 @@ public class JobServiceTest extends RestClientTestUtil{
         assertEquals(new String[]{"Chin-Lovell Engineering Associates"}, job.getSource().getParameters().get("Cascading_name_single_select"));
         assertEquals(new String[]{"DF", "Jalisco", "Mexico"}, job.getSource().getParameters().get("Cascading_state_multi_select"));
     }
-
-    @Test
+    @Deprecated
+    @Test(enabled = false)
     public void should_scheduled_and_delete_reports() {
         // Given
         ClientReportJob job = null;
